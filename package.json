@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:bizzi-i18n-vscode-extension.extractI18NFromSelected"
+    "onCommand:bizzi-i18n-vscode-extension.extractI18NFromSelected",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -30,6 +31,8 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@babel/parser": "^7.19.3",
+    "@types/babel__traverse": "^7.18.2",
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "16.x",
@@ -43,6 +46,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@babel/traverse": "^7.19.3",
+    "@babel/types": "^7.19.3",
     "vscode-uri": "^3.0.6"
   }
 }
