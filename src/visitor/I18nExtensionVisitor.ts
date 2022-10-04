@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as parser from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
-import { JSXText, StringLiteral } from "@babel/types";
 import * as vscode from "vscode";
-
-type TextNodes = StringLiteral | JSXText;
+import TDecl from "./TDecl";
+import TPair from "./TPair";
+import TPath from "./TPath";
+import { TextNodes } from "./types";
 
 export default class I18nExtensionVisitor {
   private context: vscode.ExtensionContext;
@@ -46,30 +47,56 @@ export default class I18nExtensionVisitor {
 
   traverse(selection: vscode.Selection) {
     const self = this;
-    return new Promise<NodePath<TextNodes>>((resolve) => {
+    return new Promise<TPair>((resolve, reject) => {
+      const handler = setTimeout(() => {
+        reject(new Error("timeout"));
+      }, 200);
+      const enhancedResolve: typeof resolve = (val) => {
+        clearTimeout(handler);
+        resolve(val);
+      };
+      type Payload = { path?: NodePath<TextNodes>; tDecl?: TDecl };
+      const payload: Payload = {};
+      const collect = (arg: Payload) => {
+        Object.assign(payload, arg);
+        if (
+          typeof payload.path !== "undefined" &&
+          typeof payload.tDecl !== "undefined"
+        ) {
+          self.pickElement(
+            payload.path,
+            payload.tDecl,
+            selection,
+            enhancedResolve
+          );
+        }
+      };
+
       traverse(this.ast, {
         StringLiteral(path) {
-          self.pickElement(path, selection, resolve);
+          collect({ path });
         },
         JSXText(path) {
-          self.pickElement(path, selection, resolve);
+          collect({ path });
+        },
+        VariableDeclarator(path) {
+          const tDecl = TDecl.from(path);
+          if (tDecl) {
+            collect({ tDecl });
+          }
         },
       });
     });
   }
-  private pickElement<T extends TextNodes>(
-    path: NodePath<T>,
+  private pickElement(
+    path: NodePath<TextNodes>,
+    tDecl: TDecl,
     selection: vscode.Selection,
-    resolve: (value: NodePath<T>) => void
+    resolve: (value: TPair) => void
   ) {
-    const range = new vscode.Range(
-      path.node.loc!.start.line - 1,
-      path.node.loc!.start.column,
-      path.node.loc!.end.line - 1,
-      path.node.loc!.end.column
-    );
-    if (range.contains(selection)) {
-      resolve(path);
+    const tPath = new TPath(path);
+    if (tPath.vscodeRange.contains(selection)) {
+      resolve(new TPair(tPath, tDecl));
     }
   }
 }

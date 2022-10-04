@@ -23,57 +23,39 @@ export async function extractI18nFromSelected() {
   if (!editor?.selection) {
     return;
   }
-  const { node } = await I18nExtensionVisitor.instance.traverse(
-    editor.selection
-  );
-  console.log(node);
-  //   const selectedText = editor.document.getText(editor.selection);
-  //   const fileUri = editor.document.uri;
-  //   const moduleName = Utils.basename(fileUri);
-  //   let jsonFileUri;
-  //   try {
-  //     jsonFileUri = Utils.joinPath(
-  //       Utils.dirname(fileUri),
-  //       `${moduleName}.lang.json`
-  //     );
-  //     await fs.stat(jsonFileUri);
-  //   } catch {
-  //     jsonFileUri = Utils.joinPath(
-  //       Utils.dirname(fileUri),
-  //       `${Utils.basename(fileUri).replace(/\.js/, "")}.lang.json`
-  //     );
-  //   }
-  //   //   console.log(editor?.document.fileName);
-  //   //   console.log(selectedText);
+  try {
+    const pair = await I18nExtensionVisitor.instance.traverse(editor.selection);
+    console.log(pair.path.node.value.trim());
 
-  //   const content = (await readJson(jsonFileUri)) as unknown as {
-  //     vi: any;
-  //     en: any;
-  //   };
+    const { uri: workspaceUri } = vscode.workspace.getWorkspaceFolder(
+      editor.document.uri
+    )!;
 
-  //   const [key] =
-  //     Object.entries(content.vi).filter(([_, val]) => val === selectedText)[0] ??
-  //     [];
+    const jsonFileUri = await pair.getJsonFileUriFromTDecl(workspaceUri);
+    console.log(jsonFileUri.fsPath);
 
-  //   const selectionToBeReplaced = editor.selection.with(
-  //     editor.selection.start.translate(0, -1),
-  //     editor.selection.end.translate(0, 1)
-  //   );
+    const content = (await readJson(jsonFileUri)) as { [key: string]: any };
+    console.log(content);
 
-  //   if (typeof key === "string") {
-  //     await editor.edit((edit) => {
-  //       edit.replace(selectionToBeReplaced, `t("${key}")`);
-  //     });
-  //   } else {
-  //     const newKey = (await vscode.window.showInputBox({
-  //       prompt: "Enter new key?",
-  //     })) as string;
-  //     content.en[newKey] = selectedText;
-  //     content.vi[newKey] = selectedText;
-  //     await writeJson(jsonFileUri, content);
+    const [[key]] = Object.entries(content).filter(
+      ([_, { vi }]) => vi === pair.path.node.value.trim()
+    ) ?? [[]];
 
-  //     await editor.edit((edit) => {
-  //       edit.replace(selectionToBeReplaced, `t("${newKey}")`);
-  //     });
-  // }
+    const selectionToBeReplaced = editor.selection.with(
+      editor.selection.start.translate(0, -1),
+      editor.selection.end.translate(0, 1)
+    );
+
+    if (typeof key === "string") {
+      await pair.replaceWithTKey(key);
+    } else {
+      const newKey = (await vscode.window.showInputBox({
+        prompt: "Enter new key?",
+      })) as string;
+      //   content.en[newKey] = selectedText;
+      //   content.vi[newKey] = selectedText;
+      //   await writeJson(jsonFileUri, content);
+      await pair.replaceWithTKey(newKey);
+    }
+  } catch {}
 }
