@@ -22,7 +22,7 @@ export default class TPair {
     try {
       await fs.stat(jsonFileUri);
     } catch {
-      const moduleName = this.tDecl.tLangSource.split("/")[-1];
+      const moduleName = this.tDecl.tLangSource.split("/").pop();
       jsonFileUri = Utils.joinPath(
         uri,
         `${this.tDecl.tLangSource}/${moduleName}.lang.json`
@@ -38,6 +38,8 @@ export default class TPair {
     await editor!.edit((edit) => {
       if (t.isJSXElement(this.path.parent)) {
         edit.replace(range, `{${this.tDecl.tVar}("${newKey}")}`);
+      } else {
+        edit.replace(range, `${this.tDecl.tVar}("${newKey}")`);
       }
     });
   }

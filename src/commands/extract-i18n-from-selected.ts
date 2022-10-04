@@ -25,7 +25,8 @@ export async function extractI18nFromSelected() {
   }
   try {
     const pair = await I18nExtensionVisitor.instance.traverse(editor.selection);
-    console.log(pair.path.node.value.trim());
+    const selectedText = pair.path.node.value.trim();
+    console.log(selectedText);
 
     const { uri: workspaceUri } = vscode.workspace.getWorkspaceFolder(
       editor.document.uri
@@ -37,14 +38,11 @@ export async function extractI18nFromSelected() {
     const content = (await readJson(jsonFileUri)) as { [key: string]: any };
     console.log(content);
 
-    const [[key]] = Object.entries(content).filter(
-      ([_, { vi }]) => vi === pair.path.node.value.trim()
+    const keyObj = Object.entries(content).filter(
+      ([_, { vi }]) => vi === selectedText
     ) ?? [[]];
-
-    const selectionToBeReplaced = editor.selection.with(
-      editor.selection.start.translate(0, -1),
-      editor.selection.end.translate(0, 1)
-    );
+    const key = keyObj?.[0]?.[0];
+    console.log(key);
 
     if (typeof key === "string") {
       await pair.replaceWithTKey(key);
@@ -52,10 +50,16 @@ export async function extractI18nFromSelected() {
       const newKey = (await vscode.window.showInputBox({
         prompt: "Enter new key?",
       })) as string;
+      content[newKey] = {
+        vi: selectedText,
+        en: selectedText,
+      };
       //   content.en[newKey] = selectedText;
       //   content.vi[newKey] = selectedText;
-      //   await writeJson(jsonFileUri, content);
+      await writeJson(jsonFileUri, content);
       await pair.replaceWithTKey(newKey);
     }
-  } catch {}
+  } catch (e) {
+    console.error(e);
+  }
 }
