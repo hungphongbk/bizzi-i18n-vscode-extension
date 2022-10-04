@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { URI, Utils } from "vscode-uri";
 import TDecl from "./TDecl";
 import TPath from "./TPath";
-import generate from "@babel/generator";
 import * as t from "@babel/types";
 
 const fs = vscode.workspace.fs;
