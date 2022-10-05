@@ -6,6 +6,7 @@ import TDecl from "./TDecl";
 import TPair from "./TPair";
 import TPath from "./TPath";
 import { TextNodes } from "./types";
+import { debounce } from "lodash";
 
 export default class I18nExtensionVisitor {
   private context: vscode.ExtensionContext;
@@ -32,6 +33,16 @@ export default class I18nExtensionVisitor {
           this.parse();
         }
       })
+    );
+    this.context.subscriptions.push(
+      vscode.window.onDidChangeTextEditorSelection(
+        debounce((e: vscode.TextEditorSelectionChangeEvent) => {
+          if (e.textEditor) {
+            this.textEditor = e.textEditor;
+            this.parse();
+          }
+        }, 200)
+      )
     );
   }
 
