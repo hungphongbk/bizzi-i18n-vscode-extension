@@ -50,6 +50,7 @@
     "@babel/traverse": "^7.19.3",
     "@babel/types": "^7.19.3",
     "@types/lodash": "^4.14.186",
+    "async-await-retry": "^2.0.0",
     "lodash": "^4.17.21",
     "vscode-uri": "^3.0.6"
   },

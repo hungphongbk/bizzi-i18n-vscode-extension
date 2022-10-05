@@ -7,6 +7,7 @@ import TPair from "./TPair";
 import TPath from "./TPath";
 import { TextNodes } from "./types";
 import { debounce } from "lodash";
+import retry from "async-await-retry";
 
 export default class I18nExtensionVisitor {
   private context: vscode.ExtensionContext;
@@ -50,7 +51,10 @@ export default class I18nExtensionVisitor {
     if (!this.textEditor) {
       return;
     }
-    this.ast = parser.parse(this.textEditor.document.getText(), {
+    await retry(this._parse.bind(this));
+  }
+  private async _parse() {
+    this.ast = parser.parse(this.textEditor!.document.getText(), {
       sourceType: "module",
       plugins: ["jsx"],
     });
