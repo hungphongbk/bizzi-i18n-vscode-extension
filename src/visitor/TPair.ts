@@ -36,7 +36,10 @@ export default class TPair {
 
     const editor = vscode.window.activeTextEditor;
     await editor!.edit((edit) => {
-      if (t.isJSXElement(this.path.parent)) {
+      if (
+        t.isJSXElement(this.path.parent) ||
+        t.isJSXAttribute(this.path.parent)
+      ) {
         edit.replace(range, `{${this.tDecl.tVar}("${newKey}")}`);
       }
     });
