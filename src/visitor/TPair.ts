@@ -6,6 +6,23 @@ import * as t from "@babel/types";
 
 const fs = vscode.workspace.fs;
 
+export async function getJsonFileUriFromNs(uri: vscode.Uri, ns: string) {
+  let jsonFileUri = Utils.joinPath(
+    uri,
+    `${ns}.lang.json`
+  );
+  try {
+    await fs.stat(jsonFileUri);
+  } catch {
+    const moduleName = ns.split("/").pop();
+    jsonFileUri = Utils.joinPath(
+      uri,
+      `${ns}/${moduleName}.lang.json`
+    );
+  }
+  return jsonFileUri;
+}
+
 export default class TPair {
   path: TPath;
   tDecl: TDecl;
@@ -15,20 +32,7 @@ export default class TPair {
   }
 
   async getJsonFileUriFromTDecl(uri: URI): Promise<URI> {
-    let jsonFileUri = Utils.joinPath(
-      uri,
-      `${this.tDecl.tLangSource}.lang.json`
-    );
-    try {
-      await fs.stat(jsonFileUri);
-    } catch {
-      const moduleName = this.tDecl.tLangSource.split("/")[-1];
-      jsonFileUri = Utils.joinPath(
-        uri,
-        `${this.tDecl.tLangSource}/${moduleName}.lang.json`
-      );
-    }
-    return jsonFileUri;
+    return await getJsonFileUriFromNs(uri, this.tDecl.tLangSource);
   }
 
   async replaceWithTKey(newKey: string): Promise<void> {
@@ -41,6 +45,8 @@ export default class TPair {
         t.isJSXAttribute(this.path.parent)
       ) {
         edit.replace(range, `{${this.tDecl.tVar}("${newKey}")}`);
+      } else {
+        edit.replace(range, `${this.tDecl.tVar}("${newKey}")`);
       }
     });
   }
