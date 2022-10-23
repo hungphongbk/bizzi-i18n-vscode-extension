@@ -51,6 +51,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "@babel/core": "^7.19.6",
     "@babel/traverse": "^7.19.3",
     "@babel/types": "^7.19.3",
     "async-await-retry": "^2.0.0",
