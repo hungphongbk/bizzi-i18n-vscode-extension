@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { CancellationToken, Definition, DefinitionProvider, LocationLink, Position, ProviderResult, Range, TextDocument, Uri, workspace } from "vscode";
+import { CancellationToken, Definition, DefinitionProvider, Location, LocationLink, Position, ProviderResult, Range, TextDocument, Uri, workspace } from "vscode";
 import * as parser from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
 import * as t from '@babel/types';
@@ -32,7 +32,7 @@ class I18nDefinitionSearching {
                 }
             };
             traverse(ast, {
-                async StringLiteral(path) {
+                StringLiteral(path) {
                     const range = new Range(
                         path.node.loc!.start.line - 1,
                         path.node.loc!.start.column,
@@ -41,7 +41,8 @@ class I18nDefinitionSearching {
                     );
                     if (t.isCallExpression(path.parent) && t.isIdentifier(path.parent.callee, { name: 'useTranslation' })) {
                         if (range.contains(self.position)) {
-                            enhancedResolve(await self.resolveUseTranslationSymbol(path.node.value));
+                            self.resolveUseTranslationSymbol(path.node.value).then(resolve);
+                            return;
                         } else { collect({ ns: path.node.value }); }
                     }
                     if (range.contains(self.position) && t.isCallExpression(path.parent) && t.isIdentifier(path.parent.callee, { name: 't' })) {
@@ -54,11 +55,12 @@ class I18nDefinitionSearching {
 
     private async resolveUseTranslationSymbol(ns: string): Promise<Definition> {
         const uri: Uri = await getJsonFileUriFromNs(this.workspaceUri, ns);
-        // TODO
+        return new Location(uri, new Range(0, 0, 0, 0));
     }
 
     private async resolveTFuncSymbol(ns: string, tKey: string): Promise<Definition> {
         // TODO
+        return {} as unknown as Definition;
     }
 }
 

@@ -58,6 +58,7 @@
     }
   },
   "dependencies": {
+    "@babel/core": "^7.19.6",
     "@babel/traverse": "^7.19.3",
     "@babel/types": "^7.19.3",
     "vscode-uri": "^3.0.6"
