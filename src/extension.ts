@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { extractI18nFromSelected } from "./commands";
+import I18nDefinitionProvider from "./engine/I18nDefinitionProvider";
 import I18nExtensionVisitor from "./visitor/I18nExtensionVisitor";
 
 // this method is called when your extension is activated
@@ -23,8 +24,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
+  const definitionProvider = new I18nDefinitionProvider();
+  context.subscriptions.push(vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'javascript' }, definitionProvider));
+  context.subscriptions.push(vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'typescript' }, definitionProvider));
+
   I18nExtensionVisitor.init(context);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
