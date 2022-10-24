@@ -1,14 +1,9 @@
 import * as vscode from "vscode";
 
-import { Utils } from "vscode-uri";
+import { readFile } from "../utils";
 import I18nExtensionVisitor from "../visitor/I18nExtensionVisitor";
 
 const fs = vscode.workspace.fs;
-
-const readFile = async (file: vscode.Uri) => {
-  const buf = await fs.readFile(file);
-  return Buffer.from(buf).toString("utf8");
-};
 
 const readJson = async (file: vscode.Uri) => {
   return JSON.parse(await readFile(file));
