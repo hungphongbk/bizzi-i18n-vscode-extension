@@ -62,7 +62,6 @@ class I18nDefinitionSearching {
       };
       traverse(ast, {
         StringLiteral(path) {
-          console.log(path);
           const range = new Range(
             path.node.loc!.start.line - 1,
             path.node.loc!.start.column,
@@ -135,6 +134,8 @@ export default class I18nDefinitionProvider implements DefinitionProvider {
     const linePrefix = document
       .lineAt(position)
       .text.substring(0, position.character);
+
+    // console.log(linePrefix);
     if (!/(useTranslation|t)\(\"[A-Za-z0-9-_\.\{\/]*/.test(linePrefix)) {
       return [];
     }
