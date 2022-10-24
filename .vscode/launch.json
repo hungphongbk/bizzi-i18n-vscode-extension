@@ -6,17 +6,30 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-            "name": "Launch Extension",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
-            "preLaunchTask": "npm: webpack"
-        }
+			"type": "pwa-extensionHost",
+			"request": "launch",
+			"name": "Launch Client",
+			"runtimeExecutable": "${execPath}",
+			"args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/client/out/**/*.js"],
+			"preLaunchTask": "npm: watch"
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to Server",
+			"address": "localhost",
+			"protocol": "inspector",
+			"port": 6009,
+			"sourceMaps": true,
+			"outFiles": ["${workspaceFolder}/server/out/**/*.js"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Client + Server",
+			"configurations": ["Launch Client", "Attach to Server"],
+		}
 	]
 }

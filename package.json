@@ -6,7 +6,7 @@
   "scripts": {
     "vscode:prepublish": "npm run webpack",
     "webpack": "npm run clean && webpack --mode production --config ./client/webpack.config.js && webpack --mode production --config ./server/webpack.config.js",
-    "webpack:dev": "npm run clean && webpack --mode none --config ./client/webpack.config.js && webpack --mode none --config ./server/webpack.config.js",
+    "webpack:dev": "npm run clean && concurrently 'webpack --mode none --config ./client/webpack.config.js' 'webpack --mode none --config ./server/webpack.config.js'",
     "compile": "tsc -b",
     "compile:client": "tsc -b ./client/tsconfig.json",
     "compile:server": "tsc -b ./server/tsconfig.json",
@@ -30,15 +30,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:bizzi-i18n-vscode-extension.extractI18NFromSelected",
-    "onStartupFinished"
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:json"
   ],
   "main": "./client/out/extension",
   "contributes": {
     "commands": [
       {
-        "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
-        "title": "I18n: Extract from selected text"
+        "command": "bizzi-i18n-vscode-extension.restart",
+        "title": "Bizzi I18n: Restart Server"
       }
     ]
   },
@@ -55,14 +58,15 @@
     "@types/node": "^16.11.33",
     "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
+    "concurrently": "^7.5.0",
     "eslint": "^8.21.0",
     "merge-options": "^3.0.4",
     "mocha": "^10.0.0",
     "rimraf": "^3.0.2",
+    "shelljs": "^0.8.5",
     "ts-loader": "^9.3.1",
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0",
-    "shelljs": "^0.8.5"
+    "webpack-cli": "^4.10.0"
   }
 }
