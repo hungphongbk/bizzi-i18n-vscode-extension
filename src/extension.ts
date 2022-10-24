@@ -24,12 +24,29 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
-  const definitionProvider = new I18nDefinitionProvider();
-  context.subscriptions.push(vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'javascript' }, definitionProvider));
-  context.subscriptions.push(vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'typescript' }, definitionProvider));
+  const definitionProvider = new I18nDefinitionProvider(false),
+    tsDefinitionProvider = new I18nDefinitionProvider(true);
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(
+      { scheme: "file", language: "javascript" },
+      definitionProvider
+    )
+  );
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(
+      { scheme: "file", language: "typescript" },
+      tsDefinitionProvider
+    )
+  );
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(
+      { scheme: "file", language: "typescriptreact" },
+      tsDefinitionProvider
+    )
+  );
 
   I18nExtensionVisitor.init(context);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
