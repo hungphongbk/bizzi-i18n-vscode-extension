@@ -17,7 +17,7 @@ import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 import { getJsonFileUriFromNs } from "../visitor/TPair";
 import jsonParse, { ObjectNode } from "json-to-ast";
-import { readFileAsUtf8 } from "../utils";
+import { readFile } from "../utils";
 const fs = workspace.fs;
 
 class I18nDefinitionSearching {
@@ -62,6 +62,7 @@ class I18nDefinitionSearching {
       };
       traverse(ast, {
         StringLiteral(path) {
+          console.log(path);
           const range = new Range(
             path.node.loc!.start.line - 1,
             path.node.loc!.start.column,
@@ -102,7 +103,7 @@ class I18nDefinitionSearching {
   ): Promise<Definition> {
     const uri: Uri = await getJsonFileUriFromNs(this.workspaceUri, ns);
 
-    const jsonAst = jsonParse(await readFileAsUtf8(uri)) as ObjectNode,
+    const jsonAst = jsonParse(await readFile(uri)) as ObjectNode,
       target = jsonAst.children.find(
         ({ key }) => t.isIdentifier(key) && key.value === tKey
       );
@@ -134,8 +135,6 @@ export default class I18nDefinitionProvider implements DefinitionProvider {
     const linePrefix = document
       .lineAt(position)
       .text.substring(0, position.character);
-
-    // console.log(linePrefix);
     if (!/(useTranslation|t)\(\"[A-Za-z0-9-_\.\{\/]*/.test(linePrefix)) {
       return [];
     }
