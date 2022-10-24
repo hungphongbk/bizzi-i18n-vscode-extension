@@ -42,8 +42,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
-        "title": "I18n: Extract from selected text"
+        "command": "bizzi-i18n-vscode-extension.restart",
+        "title": "Bizzi I18n: Restart Server"
       }
     ],
     "configuration": {
