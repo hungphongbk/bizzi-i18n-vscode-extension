@@ -132,6 +132,12 @@ export default class I18nDefinitionProvider implements DefinitionProvider {
     position: Position,
     token: CancellationToken
   ): ProviderResult<Definition | LocationLink[]> {
+    const linePrefix = document
+      .lineAt(position)
+      .text.substring(0, position.character);
+    if (!/(useTranslation|t)\(\"[A-Za-z0-9-_\.\{\/]*/.test(linePrefix)) {
+      return [];
+    }
     const search = new I18nDefinitionSearching(
       document,
       position,
