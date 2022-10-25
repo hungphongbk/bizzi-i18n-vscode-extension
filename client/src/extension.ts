@@ -35,6 +35,18 @@ async function getJsonResourceFile(ns: string): Promise<string> {
   return uri.toString();
 }
 
+async function getFile(name: string): Promise<string | undefined> {
+  let uri: vscode.Uri | undefined = undefined;
+  console.log(name);
+  await vscode.workspace.findFiles(name, null, 1).then((value) => {
+    console.log(value);
+    if (value.length) {
+      uri = value[0];
+    }
+  });
+  return uri ? (uri as vscode.Uri).toString() : undefined;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {

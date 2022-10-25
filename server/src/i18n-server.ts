@@ -214,38 +214,41 @@ function checkPositionInsideLoc(
 }
 connection.onDidOpenTextDocument((p1) => console.log(p1));
 
-connection.onDefinition(
-  workspace((workspaceUri, { textDocument, position }) => {
-    console.log(workspaceUri);
-    console.log(position);
-    if (!/\.lang\.json$/.test(textDocument.uri)) {
-      console.time("def");
-      const cached = Cache.instance.get(textDocument.uri)!,
-        locBasedNode = cached?.locList.find((l) =>
-          checkPositionInsideLoc(position, l.loc)
-        );
-      console.log(locBasedNode ? "found" : "not found");
-      console.timeEnd("def");
+connection.onDefinition(async ({ textDocument, position }) => {
+  console.log(position);
+  if (!/\.lang\.json$/.test(textDocument.uri)) {
+    console.time("def");
+    const cached = Cache.instance.get(textDocument.uri)!,
+      locBasedNode = cached?.locList.find((l) =>
+        checkPositionInsideLoc(position, l.loc)
+      );
+    console.log(locBasedNode ? "found" : "not found");
+    console.timeEnd("def");
 
-      if (locBasedNode instanceof UseTranslationReference) {
-        console.log(
-          `${workspaceUri}/${
-            (locBasedNode as UseTranslationReference).ns
-          }.lang.json`
-        );
-        return [
-          Location.create(
-            `${workspaceUri}/${
-              (locBasedNode as UseTranslationReference).ns
-            }.lang.json`,
-            Range.create(0, 0, 0, 0)
-          ),
-        ];
-      }
+    if (locBasedNode instanceof UseTranslationReference) {
+      // TODO
+      const jsonUri = await connection.sendRequest(
+        "getFile",
+        (locBasedNode as UseTranslationReference).ns
+      );
+      console.log(jsonUri);
+      // console.log(
+      //   `${workspaceUri}/${
+      //     (locBasedNode as UseTranslationReference).ns
+      //   }.lang.json`
+      // );
+      // return [
+      //   Location.create(
+      //     `${workspaceUri}/${
+      //       (locBasedNode as UseTranslationReference).ns
+      //     }.lang.json`,
+      //     Range.create(0, 0, 0, 0)
+      //   ),
+      // ];
     }
-    return null;
-  })
-);
+  }
+  return null;
+});
 
 connection.onRequest(
   ExtensionRequestType.extractI18nFromSelected,
