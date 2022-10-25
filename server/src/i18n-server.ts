@@ -191,5 +191,46 @@ connection.onRequest(
   extractI18nFromSelected
 );
 
+function checkPositionInsideLoc(
+  position: Position,
+  loc: SourceLocation
+): boolean {
+  if (position.line < loc.start.line - 1 || position.line > loc.end.line - 1) {
+    return false;
+  }
+  if (
+    position.line === loc.start.line - 1 &&
+    position.character < loc.start.column - 1
+  ) {
+    return false;
+  }
+  if (
+    position.line === loc.end.line - 1 &&
+    position.character > loc.end.column - 1
+  ) {
+    return false;
+  }
+  return true;
+}
+
+connection.onDefinition(({ textDocument, position }) => {
+  console.log(position);
+  if (!/\.lang\.json$/.test(textDocument.uri)) {
+    console.time("def");
+    const cached = Cache.instance.get(textDocument.uri)!,
+      locBasedNode = cached?.locList.find((l) =>
+        checkPositionInsideLoc(position, l.loc)
+      );
+    console.log(locBasedNode ? "found" : "not found");
+    console.timeEnd("def");
+  }
+  return null;
+});
+
+connection.onRequest(
+  ExtensionRequestType.extractI18nFromSelected,
+  extractI18nFromSelected
+);
+
 document.listen(connection);
 connection.listen();
