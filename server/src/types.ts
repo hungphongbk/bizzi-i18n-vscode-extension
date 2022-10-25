@@ -64,7 +64,7 @@ NodePath.prototype.isTFuncCallExpression = function () {
   );
 };
 
-abstract class LocBased {
+export abstract class LocBased {
   constructor(public readonly loc: SourceLocation) {}
 }
 
@@ -75,7 +75,7 @@ export class UseTranslationReference extends LocBased {
     const ns = path.node.init.arguments[0].value;
     const tVarName = path.node.id.properties[0].value.name;
     return new UseTranslationReference(
-      path.node.id.properties[0].value.loc!,
+      path.node.init.arguments[0].loc!,
       ns,
       tVarName
     );
@@ -87,23 +87,35 @@ export class UseTranslationReference extends LocBased {
     public readonly tVarName: string
   ) {
     super(loc);
-    Cache.instance.connection.console.log(`${ns} ${tVarName}`);
+  }
+
+  private tFuncReferences: UseTFuncReference[] = [];
+  addTFuncReferenceFromNodePath(
+    path: NodePath<TFuncCallExpression>
+  ): UseTFuncReference {
+    const ref = UseTFuncReference.getFromStringLiteralNodePath(path, this);
+    this.tFuncReferences.push(ref);
+    return ref;
   }
 }
 
 export class UseTFuncReference extends LocBased {
-  static getFromStringLiteralNodePath(path: NodePath<TFuncCallExpression>) {
+  static getFromStringLiteralNodePath(
+    path: NodePath<TFuncCallExpression>,
+    useTranslationRef: UseTranslationReference
+  ) {
     const { node } = path;
     const key = node.arguments[0].value,
       loc = node.arguments[0].loc!,
       tVarName = node.callee.name;
 
-    return new UseTFuncReference(loc, key, tVarName);
+    return new UseTFuncReference(loc, key, tVarName, useTranslationRef);
   }
   constructor(
     loc: SourceLocation,
     public readonly key: string,
-    public readonly tVarName: string
+    public readonly tVarName: string,
+    public readonly useTranslationRef: UseTranslationReference
   ) {
     super(loc);
   }

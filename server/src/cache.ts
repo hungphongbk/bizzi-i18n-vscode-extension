@@ -1,6 +1,24 @@
 import { Connection } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { makeAutoObservable, autorun } from "mobx";
+import { LocBased, UseTranslationReference } from "./types";
+
+type CacheValue = (
+  | {
+      languageId:
+        | "javascript"
+        | "javascriptreact"
+        | "typescript"
+        | "typescriptreact";
+      ref: UseTranslationReference[];
+    }
+  | {
+      languageId: "json";
+      ref: unknown;
+    }
+) & {
+  locList: LocBased[];
+};
 
 export default class Cache {
   static instance: Cache;
@@ -15,12 +33,7 @@ export default class Cache {
     });
   }
 
-  private readonly _cache: Map<
-    string,
-    {
-      document: TextDocument;
-    }
-  > = new Map();
+  private readonly _cache: Map<string, CacheValue> = new Map();
   private constructor(private readonly _connection: Connection) {
     makeAutoObservable(this);
   }
@@ -32,12 +45,10 @@ export default class Cache {
     return this._connection;
   }
 
-  set(
-    key: string,
-    payload: {
-      document: TextDocument;
-    }
-  ) {
+  set(key: string, payload: CacheValue) {
     this._cache.set(key, payload);
+  }
+  get(key: string) {
+    return this._cache.get(key);
   }
 }
