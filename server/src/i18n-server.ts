@@ -9,6 +9,7 @@ import {
 
 import { TextDocument } from "vscode-languageserver-textdocument";
 import Cache from "./cache";
+import { i18nJavascriptTraverse } from "./i18n-parser";
 
 const connection = createConnection(ProposedFeatures.all);
 Cache.initialize(connection);
@@ -28,9 +29,10 @@ connection.onInitialize((_: InitializeParams) => {
 
 document.onDidChangeContent((change) => {
   const { document } = change;
-  Cache.instance.set(document.uri, {
-    document,
-  });
+  const timeLabel = `element passed of ${document.uri}`;
+  console.time(timeLabel);
+  i18nJavascriptTraverse(document.getText());
+  console.timeEnd(timeLabel);
 });
 
 document.listen(connection);
