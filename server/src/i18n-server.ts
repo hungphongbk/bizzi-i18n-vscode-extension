@@ -2,23 +2,47 @@ import {
   createConnection,
   InitializeParams,
   InitializeResult,
+  Location,
+  LocationLink,
   Position,
   ProposedFeatures,
+  Range,
   TextDocuments,
   TextDocumentSyncKind,
+  URI,
+  WorkspaceFolder,
 } from "vscode-languageserver/node";
 
 import { TextDocument } from "vscode-languageserver-textdocument";
 import Cache from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
 import { SourceLocation } from "@babel/types";
+import { UseTranslationReference } from "./types";
 
 const connection = createConnection(ProposedFeatures.all);
 Cache.initialize(connection);
 
 const document: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-connection.onInitialize((_: InitializeParams) => {
+let workspaceFolders: WorkspaceFolder[] | null | undefined;
+
+function workspace<T, R>(func: (workspaceUri: URI, _1: T) => R): (_1: T) => R;
+function workspace<T, T2, R>(
+  func: (workspaceUri: URI, _1: T, _2: T2) => R
+): (_1: T, _2: T2) => R;
+function workspace<T, T2, T3, R>(
+  func: (workspaceUri: URI, _1: T, _2: T2, _3: T3) => R
+): (_1: T, _2: T2, _3: T3) => R;
+function workspace(func: Function) {
+  return function (...args: any[]) {
+    const uri = args[0].textDocument.uri as string,
+      workspaceFolder = workspaceFolders?.find((ws) => uri.includes(ws.uri));
+    return func.apply(null, [workspaceFolder?.uri, ...args]);
+  };
+}
+
+connection.onInitialize((params: InitializeParams) => {
+  workspaceFolders = params.workspaceFolders;
   const result: InitializeResult = {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -73,20 +97,40 @@ function checkPositionInsideLoc(
   }
   return true;
 }
+connection.onDidOpenTextDocument((p1) => console.log(p1));
 
-connection.onDefinition(({ textDocument, position }) => {
-  console.log(position);
-  if (!/\.lang\.json$/.test(textDocument.uri)) {
-    console.time("def");
-    const cached = Cache.instance.get(textDocument.uri)!,
-      locBasedNode = cached?.locList.find((l) =>
-        checkPositionInsideLoc(position, l.loc)
-      );
-    console.log(locBasedNode ? "found" : "not found");
-    console.timeEnd("def");
-  }
-  return null;
-});
+connection.onDefinition(
+  workspace((workspaceUri, { textDocument, position }) => {
+    console.log(workspaceUri);
+    console.log(position);
+    if (!/\.lang\.json$/.test(textDocument.uri)) {
+      console.time("def");
+      const cached = Cache.instance.get(textDocument.uri)!,
+        locBasedNode = cached?.locList.find((l) =>
+          checkPositionInsideLoc(position, l.loc)
+        );
+      console.log(locBasedNode ? "found" : "not found");
+      console.timeEnd("def");
+
+      if (locBasedNode instanceof UseTranslationReference) {
+        console.log(
+          `${workspaceUri}/${
+            (locBasedNode as UseTranslationReference).ns
+          }.lang.json`
+        );
+        return [
+          Location.create(
+            `${workspaceUri}/${
+              (locBasedNode as UseTranslationReference).ns
+            }.lang.json`,
+            Range.create(0, 0, 0, 0)
+          ),
+        ];
+      }
+    }
+    return null;
+  })
+);
 
 document.listen(connection);
 connection.listen();
