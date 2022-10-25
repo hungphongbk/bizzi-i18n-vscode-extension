@@ -6,7 +6,7 @@
   "scripts": {
     "vscode:prepublish": "npm run webpack",
     "webpack": "npm run clean && webpack --mode production --config ./client/webpack.config.js && webpack --mode production --config ./server/webpack.config.js",
-    "webpack:dev": "npm run clean && concurrently 'webpack --mode none --config ./client/webpack.config.js' 'webpack --mode none --config ./server/webpack.config.js'",
+    "webpack:dev": "npm run clean && concurrently 'webpack --mode none --config ./client/webpack.config.js --watch' 'webpack --mode none --config ./server/webpack.config.js --watch'",
     "compile": "tsc -b",
     "compile:client": "tsc -b ./client/tsconfig.json",
     "compile:server": "tsc -b ./server/tsconfig.json",

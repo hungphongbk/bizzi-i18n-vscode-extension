@@ -10,10 +10,13 @@
 			"request": "launch",
 			"name": "Launch Client",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
 			"sourceMaps": true,
-			"outFiles": ["${workspaceFolder}/client/out/**/*.js"],
-			"preLaunchTask": "npm: watch"
+			"outFiles": [
+				"${workspaceFolder}/client/out/**/*.js"
+			]
 		},
 		{
 			"type": "node",
@@ -23,13 +26,18 @@
 			"protocol": "inspector",
 			"port": 6009,
 			"sourceMaps": true,
-			"outFiles": ["${workspaceFolder}/server/out/**/*.js"]
+			"outFiles": [
+				"${workspaceFolder}/server/out/**/*.js"
+			]
 		}
 	],
 	"compounds": [
 		{
 			"name": "Client + Server",
-			"configurations": ["Launch Client", "Attach to Server"],
+			"configurations": [
+				"Launch Client",
+				"Attach to Server"
+			],
 		}
 	]
 }
