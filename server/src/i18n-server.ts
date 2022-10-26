@@ -1,7 +1,9 @@
 import {
   InitializeParams,
   InitializeResult,
+  Location,
   Position,
+  Range,
   TextDocumentSyncKind,
   WorkspaceFolder,
 } from "vscode-languageserver/node";
@@ -66,6 +68,7 @@ document.onDidChangeContent(async (change) => {
     });
   }
   console.timeEnd(timeLabel);
+  console.log(Cache.instance.cache.keys());
 });
 
 function checkPositionInsideLoc(
@@ -103,25 +106,12 @@ connection.onDefinition(async ({ textDocument, position }) => {
     console.timeEnd("def");
 
     if (locBasedNode instanceof UseTranslationReference) {
-      // TODO
-      // const jsonUri = await connection.sendRequest(
-      //   "getFile",
-      //   (locBasedNode as UseTranslationReference).ns
-      // );
-      // console.log(jsonUri);
-      // console.log(
-      //   `${workspaceUri}/${
-      //     (locBasedNode as UseTranslationReference).ns
-      //   }.lang.json`
-      // );
-      // return [
-      //   Location.create(
-      //     `${workspaceUri}/${
-      //       (locBasedNode as UseTranslationReference).ns
-      //     }.lang.json`,
-      //     Range.create(0, 0, 0, 0)
-      //   ),
-      // ];
+      return [
+        Location.create(
+          (<UseTranslationReference>locBasedNode).langJsonReference.uri,
+          Range.create(0, 0, 0, 0)
+        ),
+      ];
     }
   }
   return null;

@@ -13,16 +13,15 @@ import {
   TransportKind,
 } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
+import { getWorkspaceFolder } from "utils";
+import readLangJsonFile from "handler/read-lang-json";
 
 let client: LanguageClient;
 
 async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
   console.log(vscode.window.activeTextEditor!.document.uri);
-  const rootUri = vscode.workspace.getWorkspaceFolder(
-    vscode.window.activeTextEditor!.document.uri
-  )!.uri;
-  console.log(rootUri);
+  const rootUri = getWorkspaceFolder();
   try {
     uri = vscode.Uri.joinPath(rootUri!, `${ns}.lang.json`);
     await vscode.workspace.fs.stat(uri);
@@ -134,12 +133,14 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       client.onRequest(
-        ExtensionRequestType.getJsonFile,
+        ExtensionRequestType.getJsonFileFromNs,
         (payload: string): Promise<string | undefined> => {
           console.log(payload);
           return getJsonResourceFile(payload);
         }
       );
+
+      client.onRequest(ExtensionRequestType.readJsonFile, readLangJsonFile);
     })
     .catch((error) =>
       client.error(`Starting the server failed.`, error, "force")

@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 
-import { readFile } from "../utils";
+import { readFileAsUtf8 } from "../utils";
 import I18nExtensionVisitor from "../visitor/I18nExtensionVisitor";
 
 const fs = vscode.workspace.fs;
 
 const readJson = async (file: vscode.Uri) => {
-  return JSON.parse(await readFile(file));
+  return JSON.parse(await readFileAsUtf8(file));
 };
 const writeJson = async (file: vscode.Uri, json: object) => {
   const buf = Buffer.from(JSON.stringify(json, null, 2), "utf8");

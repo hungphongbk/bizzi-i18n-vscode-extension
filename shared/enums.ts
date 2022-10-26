@@ -1,5 +1,6 @@
 export enum ExtensionRequestType {
-  getJsonFile = "getJsonFile",
+  getJsonFileFromNs = "getJsonFileFromNs",
+  readJsonFile = "readJsonFile",
 }
 export type GetJsonRequestPayload = {
   ns: string;

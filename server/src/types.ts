@@ -16,6 +16,8 @@ import {
 import Cache from "./cache";
 import { connection } from "./connection";
 import { ExtensionRequestType, GetJsonRequestPayload } from "@shared";
+import { langJsonTraverse } from "i18n-parser";
+import { ObjectNode, PropertyNode } from "json-to-ast";
 
 interface UseTranslationCallExpression extends CallExpression {
   callee: Identifier;
@@ -83,7 +85,8 @@ export class UseTranslationReference extends LocBased {
     );
   }
 
-  private tFuncReferences: UseTFuncReference[] = [];
+  tFuncReferences: UseTFuncReference[] = [];
+  langJsonReference!: LangJsonReference;
   private _jsonFileUri: string = "";
 
   constructor(
@@ -107,8 +110,17 @@ export class UseTranslationReference extends LocBased {
   }
 
   async fetchJsonFileUri() {
-    this._jsonFileUri = await connection.sendRequest("getJsonFile", this.ns);
-    console.log(this._jsonFileUri);
+    this._jsonFileUri = await connection.sendRequest(
+      ExtensionRequestType.getJsonFileFromNs,
+      this.ns
+    );
+    const { jsonRef, locList } = await langJsonTraverse(this._jsonFileUri);
+    Cache.instance.set(this._jsonFileUri, {
+      languageId: "json",
+      ref: jsonRef,
+      locList,
+    });
+    this.langJsonReference = jsonRef;
   }
 }
 
@@ -131,5 +143,22 @@ export class UseTFuncReference extends LocBased {
     public readonly useTranslationRef: UseTranslationReference
   ) {
     super(loc);
+  }
+}
+
+export class LangJsonReference extends LocBased {
+  items: LangJsonItemReference[] = [];
+  constructor(private readonly node: ObjectNode, public readonly uri: string) {
+    super(node.loc!);
+    this.items = node.children.map((p) => new LangJsonItemReference(p, this));
+  }
+}
+
+export class LangJsonItemReference extends LocBased {
+  constructor(
+    private readonly node: PropertyNode,
+    readonly parent: LangJsonReference
+  ) {
+    super(node.loc!);
   }
 }
