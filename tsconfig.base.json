@@ -1,9 +1,10 @@
 {
-	"compilerOptions": {
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"strict": true
-	}
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strict": true,
+    "rootDir": "."
+  }
 }

@@ -9,6 +9,7 @@
 
 const withDefaults = require("../shared.webpack.config");
 const path = require("path");
+const { TsconfigPathsPlugin } = require("tsconfig-paths-webpack-plugin");
 
 module.exports = withDefaults({
   context: path.join(__dirname),
@@ -17,6 +18,11 @@ module.exports = withDefaults({
   },
   resolve: {
     symlinks: false,
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, "tsconfig.json"),
+      }),
+    ],
   },
   output: {
     filename: "server.js",

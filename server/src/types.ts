@@ -14,6 +14,8 @@ import {
   SourceLocation,
 } from "@babel/types";
 import Cache from "./cache";
+import { connection } from "./connection";
+import { ExtensionRequestType, GetJsonRequestPayload } from "@shared";
 
 interface UseTranslationCallExpression extends CallExpression {
   callee: Identifier;
@@ -81,6 +83,9 @@ export class UseTranslationReference extends LocBased {
     );
   }
 
+  private tFuncReferences: UseTFuncReference[] = [];
+  private _jsonFileUri: string = "";
+
   constructor(
     loc: SourceLocation,
     public readonly ns: string,
@@ -89,13 +94,23 @@ export class UseTranslationReference extends LocBased {
     super(loc);
   }
 
-  private tFuncReferences: UseTFuncReference[] = [];
+  get jsonFileUri() {
+    return this._jsonFileUri;
+  }
+
   addTFuncReferenceFromNodePath(
     path: NodePath<TFuncCallExpression>
   ): UseTFuncReference {
     const ref = UseTFuncReference.getFromStringLiteralNodePath(path, this);
     this.tFuncReferences.push(ref);
     return ref;
+  }
+
+  async fetchJsonFileUri() {
+    this._jsonFileUri = await connection.sendRequest(
+      ExtensionRequestType.getJsonFile,
+      this.ns
+    );
   }
 }
 

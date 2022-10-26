@@ -12,19 +12,29 @@ import {
   ServerOptions,
   TransportKind,
 } from "vscode-languageclient/node";
+import { ExtensionRequestType, GetJsonRequestPayload } from "@shared";
 
 let client: LanguageClient;
 
-async function getFile(name: string): Promise<string | undefined> {
+async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
-  console.log(name);
-  await vscode.workspace.findFiles(name, null, 1).then((value) => {
-    console.log(value);
-    if (value.length) {
-      uri = value[0];
-    }
-  });
-  return uri ? (uri as vscode.Uri).toString() : undefined;
+
+  try {
+    uri = vscode.Uri.joinPath(
+      vscode.workspace.workspaceFile!,
+      `${ns}.lang.json`
+    );
+    console.log(uri);
+    await vscode.workspace.fs.stat(uri);
+  } catch (e) {
+    uri = vscode.Uri.joinPath(
+      vscode.workspace.workspaceFile!,
+      `${ns + "/" + ns.substring(ns.lastIndexOf("/"))}.lang.json`
+    );
+    console.log(uri);
+  }
+
+  return uri.toString();
 }
 
 // this method is called when your extension is activated
@@ -124,9 +134,9 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       client.onRequest(
-        "getFile",
-        (nameInter: string): Promise<string | undefined> => {
-          return getFile(nameInter);
+        ExtensionRequestType.getJsonFile,
+        (payload: string): Promise<string | undefined> => {
+          return getJsonResourceFile(payload);
         }
       );
     })

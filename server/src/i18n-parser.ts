@@ -6,7 +6,7 @@ import { LocBased, UseTranslationReference } from "./types";
 
 const toBabel = require("estree-to-babel");
 
-export function i18nJavascriptTraverse(text: string) {
+export async function i18nJavascriptTraverse(text: string) {
   const ast = toBabel(parse(text, { jsx: true, loc: true })) as Node;
   const refTree: UseTranslationReference[] = [];
   const locList: LocBased[] = [];
@@ -31,5 +31,9 @@ export function i18nJavascriptTraverse(text: string) {
       }
     },
   });
+
+  // fetch json file uri
+  await Promise.all(refTree.map((r) => r.fetchJsonFileUri()));
+
   return { refTree, locList };
 }

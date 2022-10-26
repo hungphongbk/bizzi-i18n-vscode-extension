@@ -1,28 +1,16 @@
 import {
-  createConnection,
   InitializeParams,
   InitializeResult,
-  Location,
-  LocationLink,
   Position,
-  ProposedFeatures,
-  Range,
-  TextDocuments,
   TextDocumentSyncKind,
-  URI,
   WorkspaceFolder,
 } from "vscode-languageserver/node";
 
-import { TextDocument } from "vscode-languageserver-textdocument";
 import Cache from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
 import { SourceLocation } from "@babel/types";
 import { UseTranslationReference } from "./types";
-
-const connection = createConnection(ProposedFeatures.all);
-Cache.initialize(connection);
-
-const document: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+import { connection, document } from "./connection";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -53,7 +41,7 @@ connection.onInitialize((params: InitializeParams) => {
   return result;
 });
 
-document.onDidChangeContent((change) => {
+document.onDidChangeContent(async (change) => {
   const { document } = change;
   const timeLabel = `element passed of ${document.uri}`;
   console.time(timeLabel);
@@ -62,7 +50,10 @@ document.onDidChangeContent((change) => {
       (l) => l === document.languageId
     )
   ) {
-    const { refTree, locList } = i18nJavascriptTraverse(document.getText());
+    const { refTree, locList } = await i18nJavascriptTraverse(
+      document.getText()
+    );
+    console.log("cache set");
     Cache.instance.set(document.uri, {
       languageId: document.languageId as
         | "javascript"

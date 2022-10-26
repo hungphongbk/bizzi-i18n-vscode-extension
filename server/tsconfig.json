@@ -1,19 +1,18 @@
 {
-	"extends": "../tsconfig.base.json",
-	"compilerOptions": {
-		"target": "es2020",
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"sourceMap": true,
-		"outDir": "out",
-		"rootDir": "src",
-		"lib": [ "es2020" ],
-		"allowJs": true
-	},
-	"include": [
-		"src"
-	],
-	"exclude": [
-		"node_modules"
-	]
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "out",
+    "lib": ["es2020"],
+    "allowJs": true,
+    "baseUrl": "src",
+    "paths": {
+      "@shared": ["../../shared"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
