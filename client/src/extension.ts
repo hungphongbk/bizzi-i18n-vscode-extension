@@ -12,23 +12,23 @@ import {
   ServerOptions,
   TransportKind,
 } from "vscode-languageclient/node";
-import { ExtensionRequestType, GetJsonRequestPayload } from "@shared";
+import { ExtensionRequestType } from "@shared";
 
 let client: LanguageClient;
 
 async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
-
+  console.log(vscode.window.activeTextEditor!.document.uri);
+  const rootUri = vscode.workspace.getWorkspaceFolder(
+    vscode.window.activeTextEditor!.document.uri
+  )!.uri;
+  console.log(rootUri);
   try {
-    uri = vscode.Uri.joinPath(
-      vscode.workspace.workspaceFile!,
-      `${ns}.lang.json`
-    );
-    console.log(uri);
+    uri = vscode.Uri.joinPath(rootUri!, `${ns}.lang.json`);
     await vscode.workspace.fs.stat(uri);
   } catch (e) {
     uri = vscode.Uri.joinPath(
-      vscode.workspace.workspaceFile!,
+      rootUri!,
       `${ns + "/" + ns.substring(ns.lastIndexOf("/"))}.lang.json`
     );
     console.log(uri);
@@ -58,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
     },
   };
 
-  // Options to control the language client
+  // Options to control the language clients
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     documentSelector: [
@@ -136,6 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
       client.onRequest(
         ExtensionRequestType.getJsonFile,
         (payload: string): Promise<string | undefined> => {
+          console.log(payload);
           return getJsonResourceFile(payload);
         }
       );

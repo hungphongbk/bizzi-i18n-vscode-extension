@@ -11,6 +11,7 @@ import { i18nJavascriptTraverse } from "./i18n-parser";
 import { SourceLocation } from "@babel/types";
 import { UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
+import { ExtensionRequestType } from "../../shared/enums";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -103,11 +104,11 @@ connection.onDefinition(async ({ textDocument, position }) => {
 
     if (locBasedNode instanceof UseTranslationReference) {
       // TODO
-      const jsonUri = await connection.sendRequest(
-        "getFile",
-        (locBasedNode as UseTranslationReference).ns
-      );
-      console.log(jsonUri);
+      // const jsonUri = await connection.sendRequest(
+      //   "getFile",
+      //   (locBasedNode as UseTranslationReference).ns
+      // );
+      // console.log(jsonUri);
       // console.log(
       //   `${workspaceUri}/${
       //     (locBasedNode as UseTranslationReference).ns

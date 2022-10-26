@@ -107,10 +107,8 @@ export class UseTranslationReference extends LocBased {
   }
 
   async fetchJsonFileUri() {
-    this._jsonFileUri = await connection.sendRequest(
-      ExtensionRequestType.getJsonFile,
-      this.ns
-    );
+    this._jsonFileUri = await connection.sendRequest("getJsonFile", this.ns);
+    console.log(this._jsonFileUri);
   }
 }
 
