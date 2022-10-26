@@ -227,11 +227,11 @@ connection.onDefinition(async ({ textDocument, position }) => {
 
     if (locBasedNode instanceof UseTranslationReference) {
       // TODO
-      const jsonUri = await connection.sendRequest(
-        "getFile",
-        (locBasedNode as UseTranslationReference).ns
-      );
-      console.log(jsonUri);
+      // const jsonUri = await connection.sendRequest(
+      //   "getFile",
+      //   (locBasedNode as UseTranslationReference).ns
+      // );
+      // console.log(jsonUri);
       // console.log(
       //   `${workspaceUri}/${
       //     (locBasedNode as UseTranslationReference).ns
