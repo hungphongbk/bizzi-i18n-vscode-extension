@@ -226,25 +226,12 @@ connection.onDefinition(async ({ textDocument, position }) => {
     console.timeEnd("def");
 
     if (locBasedNode instanceof UseTranslationReference) {
-      // TODO
-      // const jsonUri = await connection.sendRequest(
-      //   "getFile",
-      //   (locBasedNode as UseTranslationReference).ns
-      // );
-      // console.log(jsonUri);
-      // console.log(
-      //   `${workspaceUri}/${
-      //     (locBasedNode as UseTranslationReference).ns
-      //   }.lang.json`
-      // );
-      // return [
-      //   Location.create(
-      //     `${workspaceUri}/${
-      //       (locBasedNode as UseTranslationReference).ns
-      //     }.lang.json`,
-      //     Range.create(0, 0, 0, 0)
-      //   ),
-      // ];
+      return [
+        Location.create(
+          (<UseTranslationReference>locBasedNode).langJsonReference.uri,
+          Range.create(0, 0, 0, 0)
+        ),
+      ];
     }
   }
   return null;

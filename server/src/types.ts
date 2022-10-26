@@ -199,3 +199,20 @@ export class LangJsonItemReference extends LocBased {
     )?.value as string | null | undefined;
   }
 }
+
+export class LangJsonReference extends LocBased {
+  items: LangJsonItemReference[] = [];
+  constructor(private readonly node: ObjectNode, public readonly uri: string) {
+    super(node.loc!);
+    this.items = node.children.map((p) => new LangJsonItemReference(p, this));
+  }
+}
+
+export class LangJsonItemReference extends LocBased {
+  constructor(
+    private readonly node: PropertyNode,
+    readonly parent: LangJsonReference
+  ) {
+    super(node.loc!);
+  }
+}

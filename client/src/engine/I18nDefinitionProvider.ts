@@ -17,7 +17,7 @@ import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 import { getJsonFileUriFromNs } from "../visitor/TPair";
 import jsonParse, { ObjectNode } from "json-to-ast";
-import { readFile } from "../utils";
+import { readFileAsUtf8 } from "../utils";
 const fs = workspace.fs;
 
 class I18nDefinitionSearching {
@@ -103,7 +103,7 @@ class I18nDefinitionSearching {
   ): Promise<Definition> {
     const uri: Uri = await getJsonFileUriFromNs(this.workspaceUri, ns);
 
-    const jsonAst = jsonParse(await readFile(uri)) as ObjectNode,
+    const jsonAst = jsonParse(await readFileAsUtf8(uri)) as ObjectNode,
       target = jsonAst.children.find(
         ({ key }) => t.isIdentifier(key) && key.value === tKey
       );

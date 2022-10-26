@@ -38,10 +38,7 @@ async function getJsonResourceFile(ns: string): Promise<string> {
 async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
   console.log(vscode.window.activeTextEditor!.document.uri);
-  const rootUri = vscode.workspace.getWorkspaceFolder(
-    vscode.window.activeTextEditor!.document.uri
-  )!.uri;
-  console.log(rootUri);
+  const rootUri = getWorkspaceFolder();
   try {
     uri = vscode.Uri.joinPath(rootUri!, `${ns}.lang.json`);
     await vscode.workspace.fs.stat(uri);
