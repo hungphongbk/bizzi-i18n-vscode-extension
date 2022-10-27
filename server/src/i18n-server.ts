@@ -191,27 +191,6 @@ connection.onRequest(
   extractI18nFromSelected
 );
 
-function checkPositionInsideLoc(
-  position: Position,
-  loc: SourceLocation
-): boolean {
-  if (position.line < loc.start.line - 1 || position.line > loc.end.line - 1) {
-    return false;
-  }
-  if (
-    position.line === loc.start.line - 1 &&
-    position.character < loc.start.column - 1
-  ) {
-    return false;
-  }
-  if (
-    position.line === loc.end.line - 1 &&
-    position.character > loc.end.column - 1
-  ) {
-    return false;
-  }
-  return true;
-}
 connection.onDidOpenTextDocument((p1) => console.log(p1));
 
 connection.onDefinition(async ({ textDocument, position }) => {
@@ -230,6 +209,19 @@ connection.onDefinition(async ({ textDocument, position }) => {
         Location.create(
           (<UseTranslationReference>locBasedNode).langJsonReference.uri,
           Range.create(0, 0, 0, 0)
+        ),
+      ];
+    } else if (<UseTFuncReference>locBasedNode instanceof UseTFuncReference) {
+      const ref = (<UseTFuncReference>locBasedNode).langJsonItemRef;
+      console.log(ref);
+      if (!ref) {
+        return null;
+      }
+      return [
+        Location.create(
+          (<UseTFuncReference>locBasedNode).useTranslationRef.langJsonReference
+            .uri,
+          Range.fromSourceLoc(ref.loc)
         ),
       ];
     }

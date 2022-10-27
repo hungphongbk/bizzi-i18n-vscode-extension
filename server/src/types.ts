@@ -206,6 +206,10 @@ export class LangJsonReference extends LocBased {
     super(node.loc!);
     this.items = node.children.map((p) => new LangJsonItemReference(p, this));
   }
+
+  findItemByKey(key: string) {
+    return this.items.find((i) => i.key === key);
+  }
 }
 
 export class LangJsonItemReference extends LocBased {
@@ -214,5 +218,9 @@ export class LangJsonItemReference extends LocBased {
     readonly parent: LangJsonReference
   ) {
     super(node.loc!);
+  }
+
+  get key(): string {
+    return this.node.key.value;
   }
 }
