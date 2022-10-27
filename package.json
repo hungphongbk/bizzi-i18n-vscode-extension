@@ -1,8 +1,30 @@
 {
   "name": "bizzi-i18n-vscode-extension",
   "displayName": "bizzi-i18n-vscode-extension",
+  "version": "1.0.0",
   "description": "",
-  "version": "0.5.0",
+  "scripts": {
+    "vscode:prepublish": "npm run webpack",
+    "webpack": "npm run clean && webpack --mode production --config ./client/webpack.config.js && webpack --mode production --config ./server/webpack.config.js",
+    "webpack:dev": "npm run clean && concurrently 'webpack --mode none --config ./client/webpack.config.js --watch' 'webpack --mode none --config ./server/webpack.config.js --watch'",
+    "compile": "tsc -b",
+    "compile:client": "tsc -b ./client/tsconfig.json",
+    "compile:server": "tsc -b ./server/tsconfig.json",
+    "watch": "tsc -b -w",
+    "test": "cd client && npm test && cd ..",
+    "lint": "node ./build/bin/all.js run lint",
+    "clean": "rimraf client/out && rimraf server/out",
+    "postinstall": "node ./build/bin/all.js install",
+    "symlink:lsp": "node ./build/bin/symlink.js",
+    "": "vsce package",
+    "prepare": "husky install"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hungphongbk/bizzi-i18n-vscode-extension/issues"
+  },
+  "homepage": "https://github.com/hungphongbk/bizzi-i18n-vscode-extension#readme",
   "engines": {
     "vscode": "^1.71.0"
   },
@@ -10,62 +32,46 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:bizzi-i18n-vscode-extension.extractI18NFromSelected",
-    "onStartupFinished"
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:json"
   ],
-  "main": "./dist/extension.js",
+  "main": "./client/out/extension",
   "contributes": {
     "commands": [
       {
-        "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
-        "title": "I18n: Extract from selected text"
+        "command": "bizzi-i18n-vscode-extension.restart",
+        "title": "Bizzi I18n: Restart Server"
       }
     ]
   },
   "capabilities": {
     "definitionProvider": true
   },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "webpack": "webpack --mode development",
-    "webpack-dev": "webpack --mode development --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
-    "test-compile": "tsc -p ./"
-  },
-  "devDependencies": {
-    "@babel/parser": "^7.19.3",
-    "@types/babel__generator": "^7.6.4",
-    "@types/babel__traverse": "^7.18.2",
-    "@types/glob": "^7.2.0",
-    "@types/json-to-ast": "^2.1.2",
-    "@types/lodash": "^4.14.186",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.71.0",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "@vscode/test-electron": "^2.1.5",
-    "esbuild": "^0.15.10",
-    "eslint": "^8.20.0",
-    "glob": "^8.0.3",
-    "mocha": "^10.0.0",
-    "ts-loader": "^9.4.1",
-    "typescript": "^4.7.4",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
-  },
-  "dependencies": {
-    "@babel/core": "^7.19.6",
-    "@babel/traverse": "^7.19.3",
-    "@babel/types": "^7.19.3",
-    "async-await-retry": "^2.0.0",
-    "json-to-ast": "^2.1.0",
-    "lodash": "^4.17.21",
-    "vscode-uri": "^3.0.6"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/hungphongbk/bizzi-i18n-vscode-extension.git"
   },
-  "publisher": "phongtruonghung"
+  "publisher": "phongtruonghung",
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^16.11.33",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
+    "concurrently": "^7.5.0",
+    "eslint": "^8.21.0",
+    "merge-options": "^3.0.4",
+    "mocha": "^10.0.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "shelljs": "^0.8.5",
+    "ts-loader": "^9.3.1",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "husky": "^8.0.0"
+  }
 }

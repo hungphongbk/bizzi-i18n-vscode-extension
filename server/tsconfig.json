@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "out",
+    "lib": ["es2020"],
+    "allowJs": true,
+	"esModuleInterop": true,
+    "baseUrl": "src",
+    "paths": {
+      "@shared": ["../../shared"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

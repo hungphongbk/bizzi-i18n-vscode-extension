@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+vsix=bizzi-i18n-vscode-extension.vsix
+vsce package --out $vsix
+git add $vsix
+git commit -m "bundled"
