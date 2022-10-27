@@ -13,7 +13,7 @@ import { i18nJavascriptTraverse } from "./i18n-parser";
 import { SourceLocation } from "@babel/types";
 import { UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
-import { ExtensionRequestType } from "../../shared/enums";
+import { retry } from "@shared";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -53,8 +53,8 @@ document.onDidChangeContent(async (change) => {
       (l) => l === document.languageId
     )
   ) {
-    const { refTree, locList } = await i18nJavascriptTraverse(
-      document.getText()
+    const { refTree, locList } = await retry(() =>
+      i18nJavascriptTraverse(document.getText())
     );
     console.log("cache set");
     Cache.instance.set(document.uri, {
