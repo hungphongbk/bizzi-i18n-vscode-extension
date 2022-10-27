@@ -17,7 +17,7 @@ import Cache from "./cache";
 import { connection } from "./connection";
 import { ExtensionRequestType, GetJsonRequestPayload } from "@shared";
 import { langJsonTraverse } from "i18n-parser";
-import { ObjectNode, PropertyNode } from "json-to-ast";
+import { LiteralNode, ObjectNode, PropertyNode } from "json-to-ast";
 
 interface UseTranslationCallExpression extends CallExpression {
   callee: Identifier;
@@ -176,5 +176,12 @@ export class LangJsonItemReference extends LocBased {
 
   get key(): string {
     return this.node.key.value;
+  }
+
+  lang(lang: string) {
+    return (
+      (this.node.value as ObjectNode).children.find((p) => p.key.value === lang)
+        ?.value as LiteralNode | undefined
+    )?.value;
   }
 }

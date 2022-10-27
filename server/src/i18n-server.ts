@@ -40,6 +40,7 @@ connection.onInitialize((params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       // Tell the client that this server supports code completion.
       definitionProvider: true,
+      hoverProvider: true,
     },
   };
   return result;
@@ -75,7 +76,7 @@ document.onDidChangeContent(async (change) => {
 connection.onDidOpenTextDocument((p1) => console.log(p1));
 
 connection.onDefinition(async ({ textDocument, position }) => {
-  console.log(position);
+  // console.log(position);
   if (!/\.lang\.json$/.test(textDocument.uri)) {
     console.time("def");
     const cached = Cache.instance.get(textDocument.uri)!,
@@ -92,9 +93,9 @@ connection.onDefinition(async ({ textDocument, position }) => {
           Range.create(0, 0, 0, 0)
         ),
       ];
-    } else if (<UseTFuncReference>locBasedNode instanceof UseTFuncReference) {
+    } else if (locBasedNode instanceof UseTFuncReference) {
       const ref = (<UseTFuncReference>locBasedNode).langJsonItemRef;
-      console.log(ref);
+      // console.log(ref);
       if (!ref) {
         return null;
       }
@@ -105,6 +106,34 @@ connection.onDefinition(async ({ textDocument, position }) => {
           Range.fromSourceLoc(ref.loc)
         ),
       ];
+    }
+  }
+  return null;
+});
+
+connection.onHover(async ({ textDocument, position }) => {
+  if (!/\.lang\.json$/.test(textDocument.uri)) {
+    console.time("def");
+    const cached = Cache.instance.get(textDocument.uri)!,
+      locBasedNode = cached?.locList.find((l) =>
+        checkPositionInsideLoc(position, l.loc)
+      );
+
+    if (locBasedNode instanceof UseTFuncReference) {
+      const node = locBasedNode as UseTFuncReference;
+      return {
+        contents: {
+          kind: "markdown",
+          value: [
+            `- **Vietnam**: ${
+              node.langJsonItemRef?.lang("vi") ?? "_undefined_"
+            }`,
+            `- **English**: ${
+              node.langJsonItemRef?.lang("en") ?? "_undefined_"
+            }`,
+          ].join("\n"),
+        },
+      };
     }
   }
   return null;
