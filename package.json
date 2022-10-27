@@ -15,7 +15,9 @@
     "lint": "node ./build/bin/all.js run lint",
     "clean": "rimraf client/out && rimraf server/out",
     "postinstall": "node ./build/bin/all.js install",
-    "symlink:lsp": "node ./build/bin/symlink.js"
+    "symlink:lsp": "node ./build/bin/symlink.js",
+    "": "vsce package",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "ISC",
@@ -69,6 +71,7 @@
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "husky": "^8.0.0"
   }
 }

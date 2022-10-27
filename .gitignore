@@ -3,3 +3,4 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+!bizzi-i18n-vscode-extension.vsix
