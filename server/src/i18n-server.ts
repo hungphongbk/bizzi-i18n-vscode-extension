@@ -10,11 +10,11 @@ import {
 
 import Cache from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
-import { SourceLocation } from "@babel/types";
 import { UseTFuncReference, UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
-import { retry } from "@shared";
+import { ExtensionRequestType, retry } from "@shared";
 import { checkPositionInsideLoc } from "utils";
+import { extractI18nFromSelected } from "handlers";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -55,7 +55,7 @@ document.onDidChangeContent(async (change) => {
       (l) => l === document.languageId
     )
   ) {
-    const { refTree, locList } = await retry(() =>
+    const { refTree, locList, ast } = await retry(() =>
       i18nJavascriptTraverse(document.getText())
     );
     console.log("cache set");
@@ -67,6 +67,7 @@ document.onDidChangeContent(async (change) => {
         | "typescriptreact",
       ref: refTree,
       locList,
+      ast,
     });
   }
   console.timeEnd(timeLabel);
@@ -138,6 +139,11 @@ connection.onHover(async ({ textDocument, position }) => {
   }
   return null;
 });
+
+connection.onRequest(
+  ExtensionRequestType.extractI18nFromSelected,
+  extractI18nFromSelected
+);
 
 document.listen(connection);
 connection.listen();

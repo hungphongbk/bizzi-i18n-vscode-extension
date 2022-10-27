@@ -79,12 +79,23 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  // let disposable = vscode.commands.registerCommand(
-  //   "bizzi-i18n-vscode-extension.extractI18NFromSelected",
-  //   extractI18nFromSelected
-  // );
+  let disposable = vscode.commands.registerCommand(
+    "bizzi-i18n-vscode-extension.extractI18NFromSelected",
+    async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor?.selection) {
+        return;
+      }
+      await client.sendRequest(ExtensionRequestType.extractI18nFromSelected, {
+        textDocument: {
+          uri: editor.document.uri.toString(),
+        },
+        selection: editor.selection,
+      });
+    }
+  );
 
-  // context.subscriptions.push(disposable);
+  context.subscriptions.push(disposable);
 
   // const definitionProvider = new I18nDefinitionProvider(false),
   //   tsDefinitionProvider = new I18nDefinitionProvider(true);

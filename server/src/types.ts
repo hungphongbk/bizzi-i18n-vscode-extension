@@ -114,11 +114,12 @@ export class UseTranslationReference extends LocBased {
       ExtensionRequestType.getJsonFileFromNs,
       this.ns
     );
-    const { jsonRef, locList } = await langJsonTraverse(this._jsonFileUri);
+    const { ast, jsonRef, locList } = await langJsonTraverse(this._jsonFileUri);
     Cache.instance.set(this._jsonFileUri, {
       languageId: "json",
       ref: jsonRef,
       locList,
+      ast,
     });
     this.langJsonReference = jsonRef;
   }

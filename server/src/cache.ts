@@ -1,7 +1,8 @@
 import { Connection } from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
 import { makeAutoObservable, autorun } from "mobx";
 import { LangJsonReference, LocBased, UseTranslationReference } from "./types";
+import { Node } from "@babel/types";
+import { ObjectNode } from "json-to-ast";
 
 type CacheValue = (
   | {
@@ -11,10 +12,12 @@ type CacheValue = (
         | "typescript"
         | "typescriptreact";
       ref: UseTranslationReference[];
+      ast: Node;
     }
   | {
       languageId: "json";
       ref: LangJsonReference;
+      ast: ObjectNode;
     }
 ) & {
   locList: LocBased[];
