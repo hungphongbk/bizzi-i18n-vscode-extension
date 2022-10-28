@@ -216,7 +216,7 @@ export class LangJsonReference extends LocBased {
   }
 
   findItemByText(text: string, lang: string = "vi") {
-    return this.items.find((i) => i.lang(lang) === text);
+    return this.items.find((i) => i.lang(lang)?.trim() === text.trim());
   }
 }
 
@@ -232,10 +232,10 @@ export class LangJsonItemReference extends LocBased {
     return this.node.key.value;
   }
 
-  lang(lang: string) {
+  lang(lang: string): string | null | undefined {
     return (
       (this.node.value as ObjectNode).children.find((p) => p.key.value === lang)
         ?.value as LiteralNode | undefined
-    )?.value;
+    )?.value as string | null | undefined;
   }
 }
