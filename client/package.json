@@ -37,6 +37,7 @@
     "async-await-retry": "^2.0.0",
     "json-to-ast": "^2.1.0",
     "lodash": "^4.17.21",
+    "reflect-metadata": "^0.1.13",
     "vscode-languageclient": "^8.0.2",
     "vscode-uri": "^3.0.6"
   }

@@ -10,11 +10,11 @@ import {
 
 import Cache from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
-import { SourceLocation } from "@babel/types";
 import { UseTFuncReference, UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
-import { retry } from "@shared";
+import { ExtensionRequestType, retry } from "@shared";
 import { checkPositionInsideLoc } from "utils";
+import { extractI18nFromSelected } from "handlers";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -40,6 +40,7 @@ connection.onInitialize((params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       // Tell the client that this server supports code completion.
       definitionProvider: true,
+      hoverProvider: true,
     },
   };
   return result;
@@ -54,7 +55,7 @@ document.onDidChangeContent(async (change) => {
       (l) => l === document.languageId
     )
   ) {
-    const { refTree, locList } = await retry(() =>
+    const { refTree, ...payload } = await retry(() =>
       i18nJavascriptTraverse(document.getText())
     );
     console.log("cache set");
@@ -65,7 +66,7 @@ document.onDidChangeContent(async (change) => {
         | "typescript"
         | "typescriptreact",
       ref: refTree,
-      locList,
+      ...payload,
     });
   }
   console.timeEnd(timeLabel);
@@ -75,7 +76,7 @@ document.onDidChangeContent(async (change) => {
 connection.onDidOpenTextDocument((p1) => console.log(p1));
 
 connection.onDefinition(async ({ textDocument, position }) => {
-  console.log(position);
+  // console.log(position);
   if (!/\.lang\.json$/.test(textDocument.uri)) {
     console.time("def");
     const cached = Cache.instance.get(textDocument.uri)!,
@@ -92,9 +93,9 @@ connection.onDefinition(async ({ textDocument, position }) => {
           Range.create(0, 0, 0, 0)
         ),
       ];
-    } else if (<UseTFuncReference>locBasedNode instanceof UseTFuncReference) {
+    } else if (locBasedNode instanceof UseTFuncReference) {
       const ref = (<UseTFuncReference>locBasedNode).langJsonItemRef;
-      console.log(ref);
+      // console.log(ref);
       if (!ref) {
         return null;
       }
@@ -109,6 +110,39 @@ connection.onDefinition(async ({ textDocument, position }) => {
   }
   return null;
 });
+
+connection.onHover(async ({ textDocument, position }) => {
+  if (!/\.lang\.json$/.test(textDocument.uri)) {
+    console.time("def");
+    const cached = Cache.instance.get(textDocument.uri)!,
+      locBasedNode = cached?.locList.find((l) =>
+        checkPositionInsideLoc(position, l.loc)
+      );
+
+    if (locBasedNode instanceof UseTFuncReference) {
+      const node = locBasedNode as UseTFuncReference;
+      return {
+        contents: {
+          kind: "markdown",
+          value: [
+            `- **Vietnam**: ${
+              node.langJsonItemRef?.lang("vi") ?? "_undefined_"
+            }`,
+            `- **English**: ${
+              node.langJsonItemRef?.lang("en") ?? "_undefined_"
+            }`,
+          ].join("\n"),
+        },
+      };
+    }
+  }
+  return null;
+});
+
+connection.onRequest(
+  ExtensionRequestType.extractI18nFromSelected,
+  extractI18nFromSelected
+);
 
 document.listen(connection);
 connection.listen();

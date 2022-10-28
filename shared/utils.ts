@@ -7,9 +7,9 @@ export const retry = <T>(
   return new Promise((resolve, reject) => {
     promiseReturningFunc()
       .then((success) => resolve(success))
-      .catch(() => {
+      .catch((e: any) => {
         setTimeout(() => {
-          console.log(`retrying failed promise #${currentRetry}`);
+          console.log(`retrying failed promise #${currentRetry}, reason: ${e}`);
           if (currentRetry === maxRetries) {
             return reject("maximum retries exceeded");
           }
