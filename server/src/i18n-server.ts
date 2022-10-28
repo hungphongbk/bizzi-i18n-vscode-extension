@@ -194,7 +194,7 @@ connection.onRequest(
 connection.onDidOpenTextDocument((p1) => console.log(p1));
 
 connection.onDefinition(async ({ textDocument, position }) => {
-  console.log(position);
+  // console.log(position);
   if (!/\.lang\.json$/.test(textDocument.uri)) {
     console.time("def");
     const cached = Cache.instance.get(textDocument.uri)!,
@@ -211,9 +211,9 @@ connection.onDefinition(async ({ textDocument, position }) => {
           Range.create(0, 0, 0, 0)
         ),
       ];
-    } else if (<UseTFuncReference>locBasedNode instanceof UseTFuncReference) {
+    } else if (locBasedNode instanceof UseTFuncReference) {
       const ref = (<UseTFuncReference>locBasedNode).langJsonItemRef;
-      console.log(ref);
+      // console.log(ref);
       if (!ref) {
         return null;
       }

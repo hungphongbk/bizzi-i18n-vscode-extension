@@ -53,6 +53,14 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
             encoding: "base64",
           },
         },
+        {
+          test: /\.svg$/,
+          loader: "svg-url-loader",
+          options: {
+            // make loader to behave like url-loader, for all svg files
+            encoding: "base64",
+          },
+        },
       ],
     },
     externals: {

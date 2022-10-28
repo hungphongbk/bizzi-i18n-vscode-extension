@@ -8,12 +8,7 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
 import { getWorkspaceFolder } from "utils";
-import I18nLanguageClient from "i18n-client";
-import annotation from "./ui/annotation";
-import commandsModule from "commands";
-import uiModule from "ui";
-import { Config } from "core/config";
-import coreModule from "core";
+import readLangJsonFile from "handler/read-lang-json";
 
 let client: I18nLanguageClient;
 

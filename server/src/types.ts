@@ -202,13 +202,21 @@ export class LangJsonItemReference extends LocBased {
 
 export class LangJsonReference extends LocBased {
   items: LangJsonItemReference[] = [];
-  constructor(private readonly node: ObjectNode, public readonly uri: string) {
+  constructor(
+    private readonly node: ObjectNode,
+    public readonly uri: string,
+    readonly json: object
+  ) {
     super(node.loc!);
     this.items = node.children.map((p) => new LangJsonItemReference(p, this));
   }
 
   findItemByKey(key: string) {
     return this.items.find((i) => i.key === key);
+  }
+
+  findItemByText(text: string, lang: string = "vi") {
+    return this.items.find((i) => i.lang(lang) === text);
   }
 }
 
@@ -222,5 +230,12 @@ export class LangJsonItemReference extends LocBased {
 
   get key(): string {
     return this.node.key.value;
+  }
+
+  lang(lang: string) {
+    return (
+      (this.node.value as ObjectNode).children.find((p) => p.key.value === lang)
+        ?.value as LiteralNode | undefined
+    )?.value;
   }
 }

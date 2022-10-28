@@ -44,6 +44,10 @@
       {
         "command": "bizzi-i18n-vscode-extension.restart",
         "title": "Bizzi I18n: Restart Server"
+      },
+      {
+        "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
+        "title": "Bizzi I18n: Extract from selected"
       }
     ],
     "configuration": {
@@ -89,7 +93,6 @@
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0",
-    "husky": "^8.0.0"
+    "webpack-cli": "^4.10.0"
   }
 }
