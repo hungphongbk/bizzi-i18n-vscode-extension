@@ -1,5 +1,5 @@
 import path from "path";
-import { ExtensionContext, Uri, workspace } from "vscode";
+import { ExtensionContext, Uri, window, workspace } from "vscode";
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -7,16 +7,11 @@ import {
   TransportKind,
 } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
-import { getWorkspaceFolder } from "utils";
+import { getWorkspaceFolder, writeJson } from "utils";
 import getLangJsonFile from "handler/read-lang-json";
 
-const requestKey = Symbol("request"),
-  requestMap = new Map<ExtensionRequestType, any>();
-function request(
-  target: any,
-  propertyName: string,
-  descriptor: PropertyDescriptor
-) {
+const requestMap = new Map<ExtensionRequestType, any>();
+function request(_: any, propertyName: string, descriptor: PropertyDescriptor) {
   requestMap.set(
     propertyName as unknown as ExtensionRequestType,
     descriptor.value
@@ -88,5 +83,10 @@ export default class I18nLanguageClient extends LanguageClient {
   @request
   [ExtensionRequestType.readJsonFile](uri: string) {
     return getLangJsonFile(uri);
+  }
+
+  @request
+  async [ExtensionRequestType.extractRequireKeyName]() {
+    return await window.showInputBox({ prompt: "Enter new key?" });
   }
 }

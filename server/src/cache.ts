@@ -4,7 +4,7 @@ import { LangJsonReference, LocBased, UseTranslationReference } from "./types";
 import { Node } from "@babel/types";
 import { ObjectNode } from "json-to-ast";
 
-type CacheValue = (
+export type CacheValue = (
   | {
       languageId:
         | "javascript"
@@ -18,6 +18,7 @@ type CacheValue = (
       languageId: "json";
       ref: LangJsonReference;
       ast: ObjectNode;
+      json: object;
     }
 ) & {
   locList: LocBased[];

@@ -30,12 +30,14 @@ declare module "vscode-languageserver/node" {
 }
 Object.defineProperty(Range, "fromSourceLoc", {
   get() {
-    return (loc: SourceLocation) => {
+    return (loc: SourceLocation & { source?: string | null }) => {
+      // if loc has source property that means loc comes from json-to-ast
+      const reduceCol = (loc as object).hasOwnProperty("source") ? -1 : 0;
       return Range.create(
         loc.start.line - 1,
-        loc.start.column - 1,
+        loc.start.column + reduceCol,
         loc.end.line - 1,
-        loc.end.column - 1
+        loc.end.column + reduceCol
       );
     };
   },

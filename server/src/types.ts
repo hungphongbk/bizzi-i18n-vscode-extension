@@ -114,12 +114,11 @@ export class UseTranslationReference extends LocBased {
       ExtensionRequestType.getJsonFileFromNs,
       this.ns
     );
-    const { ast, jsonRef, locList } = await langJsonTraverse(this._jsonFileUri);
+    const { jsonRef, ...payload } = await langJsonTraverse(this._jsonFileUri);
     Cache.instance.set(this._jsonFileUri, {
       languageId: "json",
       ref: jsonRef,
-      locList,
-      ast,
+      ...payload,
     });
     this.langJsonReference = jsonRef;
   }
@@ -157,13 +156,21 @@ export class UseTFuncReference extends LocBased {
 
 export class LangJsonReference extends LocBased {
   items: LangJsonItemReference[] = [];
-  constructor(private readonly node: ObjectNode, public readonly uri: string) {
+  constructor(
+    private readonly node: ObjectNode,
+    public readonly uri: string,
+    readonly json: object
+  ) {
     super(node.loc!);
     this.items = node.children.map((p) => new LangJsonItemReference(p, this));
   }
 
   findItemByKey(key: string) {
     return this.items.find((i) => i.key === key);
+  }
+
+  findItemByText(text: string, lang: string = "vi") {
+    return this.items.find((i) => i.lang(lang) === text);
   }
 }
 

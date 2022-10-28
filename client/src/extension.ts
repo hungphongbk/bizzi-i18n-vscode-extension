@@ -52,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
         },
         selection: editor.selection,
       });
+      vscode.window.showInformationMessage(`Extract succeeded`);
     }
   );
 

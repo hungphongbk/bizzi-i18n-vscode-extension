@@ -55,7 +55,7 @@ document.onDidChangeContent(async (change) => {
       (l) => l === document.languageId
     )
   ) {
-    const { refTree, locList, ast } = await retry(() =>
+    const { refTree, ...payload } = await retry(() =>
       i18nJavascriptTraverse(document.getText())
     );
     console.log("cache set");
@@ -66,8 +66,7 @@ document.onDidChangeContent(async (change) => {
         | "typescript"
         | "typescriptreact",
       ref: refTree,
-      locList,
-      ast,
+      ...payload,
     });
   }
   console.timeEnd(timeLabel);
