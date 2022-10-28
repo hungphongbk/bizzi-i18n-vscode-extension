@@ -10,12 +10,17 @@ import { ExtensionRequestType } from "@shared";
 import { getWorkspaceFolder } from "utils";
 import getLangJsonFile from "handler/read-lang-json";
 
+const requestKey = Symbol("request"),
+  requestMap = new Map<ExtensionRequestType, any>();
 function request(
-  target: I18nLanguageClient,
-  propertyKey: string,
+  target: any,
+  propertyName: string,
   descriptor: PropertyDescriptor
 ) {
-  target.onRequest(propertyKey, descriptor.value);
+  requestMap.set(
+    propertyName as unknown as ExtensionRequestType,
+    descriptor.value
+  );
 }
 
 export default class I18nLanguageClient extends LanguageClient {
@@ -57,6 +62,10 @@ export default class I18nLanguageClient extends LanguageClient {
       serverOptions,
       clientOptions
     );
+
+    requestMap.forEach((val, key) => {
+      this.onRequest(key, val);
+    });
   }
 
   @request
