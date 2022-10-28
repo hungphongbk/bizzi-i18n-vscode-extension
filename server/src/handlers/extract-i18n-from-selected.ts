@@ -88,8 +88,8 @@ export async function extractI18nFromSelected({
     if (isNewKey) {
       const json = { ...langFileRef.json } as any;
       json[extractedKey] = {
-        vi: nodePath.node.value,
-        en: nodePath.node.value,
+        vi: nodePath.node.value.trim(),
+        en: nodePath.node.value.trim(),
       };
 
       edit.changes![langFileRef.uri] = [
