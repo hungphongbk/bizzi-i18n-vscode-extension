@@ -1,7 +1,7 @@
 {
   "name": "bizzi-i18n-vscode-extension",
   "displayName": "bizzi-i18n-vscode-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "scripts": {
     "vscode:prepublish": "npm run webpack",
