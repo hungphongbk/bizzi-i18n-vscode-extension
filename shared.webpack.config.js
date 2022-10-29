@@ -10,6 +10,11 @@
 
 const path = require("path");
 const merge = require("merge-options");
+const TerserPlugin = require("terser-webpack-plugin");
+
+const isProduction =
+  process.argv[process.argv.indexOf("--mode") + 1] === "production";
+console.log(isProduction ? "is production" : "fuck");
 
 module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
   /** @type WebpackConfig */
@@ -62,6 +67,16 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
     },
     // yes, really source maps
     devtool: "source-map",
+    optimization: {
+      minimize: isProduction,
+      minimizer: [
+        new TerserPlugin({
+          minify: TerserPlugin.swcMinify,
+          // `terserOptions` options will be passed to `swc` (`@swc/core`)
+          // Link to options - https://swc.rs/docs/config-js-minify
+        }),
+      ],
+    },
   };
 
   return merge(defaultConfig, extConfig);

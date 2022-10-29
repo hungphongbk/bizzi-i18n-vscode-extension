@@ -9,6 +9,8 @@ git add $vsix
 git commit -m "bundled: $last_commit_msg"
 
 last_bundled_id_from_head=$(git rev-list --branches --not --remotes=origin --count)
-
-git reset --soft HEAD~${last_bundled_id_from_head}
-git commit -m "bundled: $last_commit_msg"
+if [ $last_bundled_id_from_head -gt 0 ]
+then
+    git reset --soft HEAD~${last_bundled_id_from_head}
+    git commit -m "bundled: $last_commit_msg"
+fi
