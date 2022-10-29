@@ -60,6 +60,7 @@
   },
   "publisher": "phongtruonghung",
   "devDependencies": {
+    "@swc/core": "^1.3.11",
     "@types/mocha": "^9.1.1",
     "@types/node": "^16.11.33",
     "@typescript-eslint/eslint-plugin": "^5.32.0",
@@ -74,7 +75,7 @@
     "shelljs": "^0.8.5",
     "svg-inline-loader": "^0.8.2",
     "svg-url-loader": "^8.0.0",
-    "ts-loader": "^9.3.1",
+    "swc-loader": "^0.2.3",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",

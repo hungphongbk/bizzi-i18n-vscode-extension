@@ -4,7 +4,7 @@
 		"module": "commonjs",
 		"target": "es2020",
 		"outDir": "out",
-		"rootDir": "src",
+		"rootDir": ".",
 		"lib": [ "es2020" ],
 		"sourceMap": true
 	},
