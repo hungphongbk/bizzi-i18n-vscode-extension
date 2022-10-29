@@ -8,5 +8,7 @@ vsce package --out $vsix
 git add $vsix
 git commit -m "bundled: $last_commit_msg"
 
-# git reset --soft HEAD~2
-# git commit -m "bundled: $last_commit_msg"
+last_bundled_id_from_head=$(git rev-list --branches --not --remotes=origin --count)
+
+git reset --soft HEAD~${last_bundled_id_from_head}
+git commit -m "bundled: $last_commit_msg"
