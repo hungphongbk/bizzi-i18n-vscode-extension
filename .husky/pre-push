@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-last_commit_msg = $(git show -s --format=%s)
+last_commit_msg=$(git show -s --format=%s)
 
 vsix=bizzi-i18n-vscode-extension.vsix
 vsce package --out $vsix
 git add $vsix
-git commit -m "bundled"
-
-git reset --soft HEAD~2
 git commit -m "bundled: $last_commit_msg"
+
+# git reset --soft HEAD~2
+# git commit -m "bundled: $last_commit_msg"
