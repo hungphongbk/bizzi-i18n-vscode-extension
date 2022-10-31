@@ -5,30 +5,14 @@ import * as vscode from "vscode";
 // import I18nDefinitionProvider from "./engine/I18nDefinitionProvider";
 // import I18nExtensionVisitor from "./visitor/I18nExtensionVisitor";
 
-import { LanguageClient } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
 import { getWorkspaceFolder } from "utils";
-import readLangJsonFile from "handler/read-lang-json";
+import I18nLanguageClient from "i18n-client";
+import commandModule from "commands";
+import coreModule from "core";
+import uiModule from "ui";
 
 let client: I18nLanguageClient;
-
-async function getJsonResourceFile(ns: string): Promise<string> {
-  let uri: vscode.Uri | undefined = undefined;
-  console.log(vscode.window.activeTextEditor!.document.uri);
-  const rootUri = getWorkspaceFolder();
-  try {
-    uri = vscode.Uri.joinPath(rootUri!, `${ns}.lang.json`);
-    await vscode.workspace.fs.stat(uri);
-  } catch (e) {
-    uri = vscode.Uri.joinPath(
-      rootUri!,
-      `${ns + "/" + ns.substring(ns.lastIndexOf("/"))}.lang.json`
-    );
-    console.log(uri);
-  }
-
-  return uri.toString();
-}
 
 async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
@@ -144,7 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       context.subscriptions.push(...coreModule(context, client));
       context.subscriptions.push(...uiModule(context, client));
-      context.subscriptions.push(...commandsModule(context, client));
+      context.subscriptions.push(...commandModule(context, client));
     })
     .catch((error) =>
       client.error(`Starting the server failed.`, error, "force")

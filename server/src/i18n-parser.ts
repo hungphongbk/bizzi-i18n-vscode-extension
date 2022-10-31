@@ -57,19 +57,3 @@ export async function langJsonTraverse(uri: URI) {
 
   return { ast: jsonAst, jsonRef, locList, json };
 }
-
-export async function langJsonTraverse(uri: URI) {
-  const text = (await connection.sendRequest(
-    ExtensionRequestType.readJsonFile,
-    uri
-  )) as string;
-
-  const locList: LocBased[] = [];
-
-  const json = JSON.parse(text);
-  const jsonAst = jsonParse(text, { loc: true }) as ObjectNode;
-  const jsonRef = new LangJsonReference(jsonAst, uri, json);
-  locList.push(jsonRef, ...jsonRef.items);
-
-  return { ast: jsonAst, jsonRef, locList, json };
-}
