@@ -74,7 +74,7 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
       libraryTarget: "commonjs",
     },
     // yes, really source maps
-    devtool: "inline-source-map",
+    devtool: "source-map",
     optimization: {
       minimize: isProduction,
       minimizer: [

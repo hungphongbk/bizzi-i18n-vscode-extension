@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import traverse, { Scope, NodePath, Hub } from "@babel/traverse";
+import traverse from "@babel/traverse";
 import { parse } from "@typescript-eslint/typescript-estree";
-import { Node, SourceLocation } from "@babel/types";
+import { Node } from "@babel/types";
 import { LangJsonReference, LocBased, UseTranslationReference } from "./types";
 import { URI } from "vscode-languageserver/node";
 import { connection } from "connection";
-import { ExtensionRequestType } from "../../shared/enums";
+import { ExtensionRequestType } from "@shared";
 import jsonParse, { ObjectNode } from "json-to-ast";
 
 const toBabel = require("estree-to-babel");
