@@ -48,12 +48,20 @@ export function activate(context: vscode.ExtensionContext) {
       if (!editor?.selection) {
         return;
       }
-      await client.sendRequest(ExtensionRequestType.extractI18nFromSelected, {
-        textDocument: {
-          uri: editor.document.uri.toString(),
-        },
-        selection: editor.selection,
-      });
+      const uris: string[] = await client.sendRequest(
+        ExtensionRequestType.extractI18nFromSelected,
+        {
+          textDocument: {
+            uri: editor.document.uri.toString(),
+          },
+          selection: editor.selection,
+        }
+      );
+      for (const uri of uris) {
+        await vscode.workspace
+          .openTextDocument(vscode.Uri.parse(uri))
+          .then((doc) => doc.save());
+      }
       vscode.window.showInformationMessage(`Extract succeeded`);
     }
   );
