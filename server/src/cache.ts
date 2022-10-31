@@ -38,6 +38,7 @@ export default class Cache {
   }
 
   private readonly _cache: Map<string, CacheValue> = new Map();
+  private readonly _cachePromise: Map<string, Promise<unknown>> = new Map();
   private constructor(private readonly _connection: Connection) {
     makeAutoObservable(this);
   }
@@ -54,5 +55,11 @@ export default class Cache {
   }
   get(key: string) {
     return this._cache.get(key);
+  }
+  getPromise(key: string) {
+    return this._cachePromise.get(key);
+  }
+  setPromise(key: string, payload: Promise<unknown>) {
+    this._cachePromise.set(key, payload);
   }
 }

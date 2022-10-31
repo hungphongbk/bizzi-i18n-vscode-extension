@@ -42,14 +42,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "bizzi-i18n-vscode-extension.restart",
+        "command": "bizzi-i18n.restart",
         "title": "Bizzi I18n: Restart Server"
       },
       {
-        "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
+        "command": "bizzi-i18n.extractI18NFromSelected",
         "title": "Bizzi I18n: Extract from selected"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Bizzi I18n",
+      "properties": {
+        "bizzi-i18n.displayLanguage": {
+          "type": "string",
+          "description": "Display Language"
+        }
+      }
+    }
   },
   "capabilities": {
     "definitionProvider": true

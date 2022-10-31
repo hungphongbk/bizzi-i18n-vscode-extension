@@ -62,6 +62,7 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
       // all output goes into `dist`.
       // packaging depends on that and this must always be like it
       filename: "[name].js",
+      // @ts-ignore
       path: path.join(extConfig.context, "out"),
       libraryTarget: "commonjs",
     },
