@@ -7,7 +7,7 @@ import {
   TransportKind,
 } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
-import { getWorkspaceFolder, writeJson } from "utils";
+import { getWorkspaceFolder } from "utils";
 import getLangJsonFile from "handler/read-lang-json";
 
 const requestMap = new Map<ExtensionRequestType, any>();

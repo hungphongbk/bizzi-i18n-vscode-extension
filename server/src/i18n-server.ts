@@ -17,7 +17,7 @@ import { delay, ExtensionRequestType, isTypescript, retry } from "@shared";
 import { checkPositionInsideLoc } from "utils";
 import { extractI18nFromSelected } from "handlers";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { flatten } from "lodash";
+import flatten from "lodash/flatten";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 

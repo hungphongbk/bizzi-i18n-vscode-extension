@@ -11,7 +11,6 @@ export const retry = <T>(
         setTimeout(() => {
           console.log(`retrying failed promise #${currentRetry}, reason: ${e}`);
           if (currentRetry === maxRetries) {
-            throw e;
             return reject("maximum retries exceeded");
           }
           retry(promiseReturningFunc, ms, maxRetries, ++currentRetry).then(

@@ -1,5 +1,5 @@
 import { Config } from "core/config";
-import { throttle } from "lodash";
+import throttle from "lodash/throttle";
 import { ExtensionModule, THROTTLE_DELAY } from "utils";
 import {
   DecorationOptions,
