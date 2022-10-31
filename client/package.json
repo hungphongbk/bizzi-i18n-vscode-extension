@@ -1,0 +1,42 @@
+{
+  "name": "bizzi-i18n-vscode-extension",
+  "displayName": "bizzi-i18n-vscode-extension",
+  "description": "",
+  "version": "0.5.0",
+  "scripts": {
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
+    "test-compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@babel/parser": "^7.19.3",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.18.2",
+    "@types/glob": "^7.2.0",
+    "@types/json-to-ast": "^2.1.2",
+    "@types/lodash": "^4.14.186",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.71.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
+    "esbuild": "^0.15.10",
+    "eslint": "^8.20.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "typescript": "^4.7.4",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/traverse": "^7.19.3",
+    "@babel/types": "^7.19.3",
+    "async-await-retry": "^2.0.0",
+    "json-to-ast": "^2.1.0",
+    "lodash": "^4.17.21",
+    "reflect-metadata": "^0.1.13",
+    "vscode-languageclient": "^8.0.2",
+    "vscode-uri": "^3.0.6"
+  }
+}

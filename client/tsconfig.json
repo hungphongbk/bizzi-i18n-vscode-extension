@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "commonjs",
+    "target": "ES2020",
+    "outDir": "out",
+    "lib": ["ES2020"],
+    "sourceMap": true,
+    "strict": true /* enable all strict type-checking options */,
+    /* Additional Checks */
+    // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+    // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
+    // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "src",
+    "paths": {
+      "@shared": ["../../shared"]
+    }
+  },
+  "include": ["src", "../shared"],
+  "exclude": ["node_modules"]
+}

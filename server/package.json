@@ -1,0 +1,47 @@
+{
+  "name": "eslint-server",
+  "version": "2.2.5",
+  "private": true,
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/traverse": "^7.19.3",
+    "@babel/types": "^7.19.3",
+    "@typescript-eslint/parser": "^5.40.1",
+    "@typescript-eslint/typescript-estree": "^5.40.1",
+    "async-await-retry": "^2.0.0",
+    "eslint": "^8.26.0",
+    "estree-to-babel": "^5.0.1",
+    "flag-icons": "^6.6.6",
+    "json-to-ast": "^2.1.0",
+    "lodash": "^4.17.21",
+    "mobx": "^6.6.2",
+    "vscode-json-languageservice": "^5.1.1",
+    "vscode-languageserver": "8.0.2",
+    "vscode-languageserver-textdocument": "1.0.5",
+    "vscode-uri": "^3.0.3"
+  },
+  "scripts": {
+    "webpack": "npm run clean && webpack --mode production --config ./webpack.config.js",
+    "webpack:dev": "npm run clean && webpack --mode none --config ./webpack.config.js",
+    "clean": "rimraf ./out",
+    "lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.18.2",
+    "@types/glob": "^7.2.0",
+    "@types/json-to-ast": "^2.1.2",
+    "@types/lodash": "^4.14.186",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.71.0",
+    "svg-inline-loader": "^0.8.2",
+    "webpack-build-notifier": "^2.3.0"
+  }
+}
