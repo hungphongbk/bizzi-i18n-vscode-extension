@@ -11,7 +11,7 @@ import {
   TextEdit,
   WorkspaceEdit,
 } from "vscode-languageserver/node";
-import { ExtensionRequestType } from "../../../shared/enums";
+import { ExtensionRequestType } from "@shared";
 
 type Selection = ReturnType<typeof Range.create>;
 type ExtractI18nFromSelectedRequest = Pick<
@@ -36,6 +36,7 @@ function doTraverse(cached: CacheValue, selection: Selection) {
       traverse(cached?.ast, {
         StringLiteral: pick,
         JSXText: pick,
+        noScope: true,
       });
       resolve(undefined);
     } else {
@@ -46,7 +47,7 @@ function doTraverse(cached: CacheValue, selection: Selection) {
 export async function extractI18nFromSelected({
   textDocument,
   selection,
-}: ExtractI18nFromSelectedRequest): Promise<void> {
+}: ExtractI18nFromSelectedRequest): Promise<string[] | undefined> {
   console.time("extract");
   const cached = Cache.instance.get(textDocument.uri);
   if (!cached) {
@@ -109,7 +110,10 @@ export async function extractI18nFromSelected({
     ];
 
     await connection.workspace.applyEdit(edit);
+    console.timeEnd("extract");
+    return Object.keys(edit.changes!).reverse();
   }
 
-  console.timeEnd("extract");
+  console.timeEnd("exreact");
+  return undefined;
 }

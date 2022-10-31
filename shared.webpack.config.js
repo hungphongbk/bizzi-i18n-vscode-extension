@@ -14,7 +14,6 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 const isProduction =
   process.argv[process.argv.indexOf("--mode") + 1] === "production";
-console.log(isProduction ? "is production" : "fuck");
 
 module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
   /** @type WebpackConfig */
