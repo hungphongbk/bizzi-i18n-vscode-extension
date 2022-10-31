@@ -10,6 +10,10 @@
 
 const path = require("path");
 const merge = require("merge-options");
+const TerserPlugin = require("terser-webpack-plugin");
+
+const isProduction =
+  process.argv[process.argv.indexOf("--mode") + 1] === "production";
 
 module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
   /** @type WebpackConfig */
@@ -28,18 +32,25 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
         {
           test: /\.ts$/,
           exclude: /node_modules/,
-          use: [
-            {
-              // configure TypeScript loader:
-              // * enable sources maps for end-to-end source maps
-              loader: "ts-loader",
-              options: {
-                compilerOptions: {
-                  sourceMap: true,
+          use: {
+            loader: "swc-loader",
+            options: {
+              jsc: {
+                parser: {
+                  syntax: "typescript",
+                  decorators: true,
                 },
               },
             },
-          ],
+          },
+        },
+        {
+          test: /\.svg$/,
+          loader: "svg-url-loader",
+          options: {
+            // make loader to behave like url-loader, for all svg files
+            encoding: "base64",
+          },
         },
         {
           test: /\.svg$/,
@@ -58,11 +69,22 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
       // all output goes into `dist`.
       // packaging depends on that and this must always be like it
       filename: "[name].js",
+      // @ts-ignore
       path: path.join(extConfig.context, "out"),
       libraryTarget: "commonjs",
     },
     // yes, really source maps
     devtool: "source-map",
+    optimization: {
+      minimize: isProduction,
+      minimizer: [
+        new TerserPlugin({
+          minify: TerserPlugin.swcMinify,
+          // `terserOptions` options will be passed to `swc` (`@swc/core`)
+          // Link to options - https://swc.rs/docs/config-js-minify
+        }),
+      ],
+    },
   };
 
   return merge(defaultConfig, extConfig);

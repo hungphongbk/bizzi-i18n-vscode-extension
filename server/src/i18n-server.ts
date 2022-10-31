@@ -6,15 +6,27 @@ import {
   Range,
   TextDocumentSyncKind,
   WorkspaceFolder,
+  TextDocumentChangeEvent,
+  Hover,
 } from "vscode-languageserver/node";
 
-import Cache from "./cache";
+import Cache, { CacheValue } from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
 import { UseTFuncReference, UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
-import { ExtensionRequestType, retry } from "@shared";
+import {
+  delay,
+  ExtensionRequestType,
+  isTypescript,
+  predefinedLanguages,
+  retry,
+} from "@shared";
 import { checkPositionInsideLoc } from "utils";
 import { extractI18nFromSelected } from "handlers";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import flatten from "lodash/flatten";
+import { renderMarkdown } from "../../shared/hover";
+import { mapValues } from "lodash";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -46,10 +58,13 @@ connection.onInitialize((params: InitializeParams) => {
   return result;
 });
 
-document.onDidChangeContent(async (change) => {
+async function onDidChangeContentEventHandler(
+  change: TextDocumentChangeEvent<TextDocument>
+) {
   const { document } = change;
   const timeLabel = `element passed of ${document.uri}`;
   console.time(timeLabel);
+  let cached: CacheValue | undefined = undefined;
   if (
     ["javascript", "javascriptreact", "typescript", "typescriptreact"].some(
       (l) => l === document.languageId
@@ -59,7 +74,7 @@ document.onDidChangeContent(async (change) => {
       i18nJavascriptTraverse(document.getText())
     );
     console.log("cache set");
-    Cache.instance.set(document.uri, {
+    cached = {
       languageId: document.languageId as
         | "javascript"
         | "javascriptreact"
@@ -67,13 +82,64 @@ document.onDidChangeContent(async (change) => {
         | "typescriptreact",
       ref: refTree,
       ...payload,
-    });
+    };
+    Cache.instance.set(document.uri, cached);
   }
   console.timeEnd(timeLabel);
-  console.log(Cache.instance.cache.keys());
+  // console.log(Cache.instance.cache.keys());
+  return cached;
+}
+document.onDidChangeContent((change) => {
+  Cache.instance.setPromise(
+    change.document.uri,
+    onDidChangeContentEventHandler(change)
+  );
 });
+connection.onRequest(
+  ExtensionRequestType.annotationRequest,
+  async ({ documentUri, lang }: { documentUri: string; lang: string }) => {
+    console.log(documentUri);
+    while (!Cache.instance.getPromise(documentUri)) {
+      await delay(1);
+    }
+    const cached = (await Cache.instance.getPromise(documentUri)) as CacheValue;
+    // console.log(ExtensionRequestType.annotationRequest);
+    // console.log(cached);
+    if (isTypescript(cached.languageId)) {
+      const rs = flatten(
+        (cached.ref as UseTranslationReference[]).map((useTransRef) =>
+          useTransRef.tFuncReferences.map((tFunRef) => ({
+            range: Range.fromSourceLoc(tFunRef.fnLoc),
+            hoverMessage: {
+              value: renderMarkdown(
+                Object.keys(predefinedLanguages).reduce((acc, key) => {
+                  if (key === lang) {
+                    return acc;
+                  }
+                  return { ...acc, [key]: tFunRef.lang(lang) };
+                }, {})
+              ),
+            },
+            renderOptions: {
+              after: {
+                color: "#aaa",
+                contentText: `"${tFunRef.lang(lang)}"`,
+                fontStyle: "normal",
+                border: "0.5px solid #444;border-radius:2px;",
+              },
+            },
+          }))
+        )
+      );
+      // console.log(JSON.stringify(rs, null, 2));
+      return rs;
+    }
 
-connection.onDidOpenTextDocument((p1) => console.log(p1));
+    return undefined;
+  }
+);
+
+// connection.onDidOpenTextDocument((p1) => console.log(p1));
 
 connection.onDefinition(async ({ textDocument, position }) => {
   // console.log(position);
@@ -113,7 +179,6 @@ connection.onDefinition(async ({ textDocument, position }) => {
 
 connection.onHover(async ({ textDocument, position }) => {
   if (!/\.lang\.json$/.test(textDocument.uri)) {
-    console.time("def");
     const cached = Cache.instance.get(textDocument.uri)!,
       locBasedNode = cached?.locList.find((l) =>
         checkPositionInsideLoc(position, l.loc)
@@ -121,19 +186,64 @@ connection.onHover(async ({ textDocument, position }) => {
 
     if (locBasedNode instanceof UseTFuncReference) {
       const node = locBasedNode as UseTFuncReference;
-      return {
+      const payload: Hover = {
         contents: {
           kind: "markdown",
-          value: [
-            `- **Vietnam**: ${
-              node.langJsonItemRef?.lang("vi") ?? "_undefined_"
-            }`,
-            `- **English**: ${
-              node.langJsonItemRef?.lang("en") ?? "_undefined_"
-            }`,
-          ].join("\n"),
+          value: renderMarkdown(
+            Object.keys(predefinedLanguages).reduce((acc, key) => {
+              return {
+                ...acc,
+                [key]: node.langJsonItemRef?.lang(key),
+              };
+            }, {})
+          ),
         },
       };
+      // console.log(payload);
+      return payload;
+    }
+  }
+  return null;
+});
+
+connection.onRequest(
+  ExtensionRequestType.extractI18nFromSelected,
+  extractI18nFromSelected
+);
+
+connection.onDidOpenTextDocument((p1) => console.log(p1));
+
+connection.onDefinition(async ({ textDocument, position }) => {
+  // console.log(position);
+  if (!/\.lang\.json$/.test(textDocument.uri)) {
+    console.time("def");
+    const cached = Cache.instance.get(textDocument.uri)!,
+      locBasedNode = cached?.locList.find((l) =>
+        checkPositionInsideLoc(position, l.loc)
+      );
+    console.log(locBasedNode ? "found" : "not found");
+    console.timeEnd("def");
+
+    if (locBasedNode instanceof UseTranslationReference) {
+      return [
+        Location.create(
+          (<UseTranslationReference>locBasedNode).langJsonReference.uri,
+          Range.create(0, 0, 0, 0)
+        ),
+      ];
+    } else if (locBasedNode instanceof UseTFuncReference) {
+      const ref = (<UseTFuncReference>locBasedNode).langJsonItemRef;
+      // console.log(ref);
+      if (!ref) {
+        return null;
+      }
+      return [
+        Location.create(
+          (<UseTFuncReference>locBasedNode).useTranslationRef.langJsonReference
+            .uri,
+          Range.fromSourceLoc(ref.loc)
+        ),
+      ];
     }
   }
   return null;

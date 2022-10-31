@@ -1,21 +1,27 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import traverse from "@babel/traverse";
 import { parse } from "@typescript-eslint/typescript-estree";
-import { Node, SourceLocation } from "@babel/types";
+import { Node } from "@babel/types";
 import { LangJsonReference, LocBased, UseTranslationReference } from "./types";
 import { URI } from "vscode-languageserver/node";
 import { connection } from "connection";
-import { ExtensionRequestType } from "../../shared/enums";
+import { ExtensionRequestType } from "@shared";
 import jsonParse, { ObjectNode } from "json-to-ast";
 
 const toBabel = require("estree-to-babel");
 
 export async function i18nJavascriptTraverse(text: string) {
-  const ast = toBabel(parse(text, { jsx: true, loc: true })) as Node;
+  const originAst = parse(text, {
+    jsx: true,
+    loc: true,
+    errorOnTypeScriptSyntacticAndSemanticIssues: false,
+  });
+  const ast = toBabel(originAst) as Node;
   const refTree: UseTranslationReference[] = [];
   const locList: LocBased[] = [];
 
   traverse(ast, {
+    noScope: true,
     VariableDeclarator(path) {
       if (path.isUseTranslationDeclarator()) {
         const ref = UseTranslationReference.getFromStringLiteralNodePath(path);
@@ -36,9 +42,9 @@ export async function i18nJavascriptTraverse(text: string) {
     },
   });
 
-  // fetch json file uri
+  // fetch json file uris
   await Promise.all(refTree.map((r) => r.fetchJsonFileUri()));
-
+  console.log("done");
   return { ast, refTree, locList };
 }
 

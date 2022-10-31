@@ -7,7 +7,7 @@ import {
   TransportKind,
 } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
-import { getWorkspaceFolder, writeJson } from "utils";
+import { getWorkspaceFolder } from "utils";
 import getLangJsonFile from "handler/read-lang-json";
 
 const requestMap = new Map<ExtensionRequestType, any>();
@@ -50,6 +50,10 @@ export default class I18nLanguageClient extends LanguageClient {
         ].map((language) => ({ scheme: "file", language })),
         { scheme: "file", language: "json", pattern: "**/*.lang.json" },
       ],
+      markdown: {
+        isTrusted: true,
+        supportHtml: true,
+      },
     };
     super(
       "bizzi-i18n-server",

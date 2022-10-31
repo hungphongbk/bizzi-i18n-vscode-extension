@@ -1,6 +1,6 @@
 export const retry = <T>(
   promiseReturningFunc: () => Promise<T>,
-  ms = 500,
+  ms = 700,
   maxRetries = 10,
   currentRetry = 0
 ): Promise<T> => {
@@ -20,3 +20,17 @@ export const retry = <T>(
       });
   });
 };
+
+export function delay(ms = 700) {
+  return new Promise((resolve) => setTimeout(resolve));
+}
+
+export function isTypescript(
+  languageId: string
+): languageId is
+  | "javascript"
+  | "javascriptreact"
+  | "typescript"
+  | "typescriptreact" {
+  return /^(javascript|typescript)/.test(languageId);
+}

@@ -6,7 +6,7 @@ import TDecl from "./TDecl";
 import TPair from "./TPair";
 import TPath from "./TPath";
 import { TextNodes } from "./types";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import retry from "async-await-retry";
 
 export default class I18nExtensionVisitor {

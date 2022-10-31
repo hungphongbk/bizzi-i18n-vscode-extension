@@ -132,15 +132,17 @@ export class UseTFuncReference extends LocBased {
     const { node } = path;
     const key = node.arguments[0].value,
       loc = node.arguments[0].loc!,
-      tVarName = node.callee.name;
+      tVarName = node.callee.name,
+      fnLoc = node.loc!;
 
-    return new UseTFuncReference(loc, key, tVarName, useTranslationRef);
+    return new UseTFuncReference(loc, key, tVarName, useTranslationRef, fnLoc);
   }
   constructor(
     loc: SourceLocation,
     public readonly key: string,
     public readonly tVarName: string,
-    public readonly useTranslationRef: UseTranslationReference
+    public readonly useTranslationRef: UseTranslationReference,
+    public readonly fnLoc: SourceLocation
   ) {
     super(loc);
   }
@@ -151,6 +153,10 @@ export class UseTFuncReference extends LocBased {
 
   get langJsonItemRef(): LangJsonItemReference | undefined {
     return this.langJsonRef.findItemByKey(this.key);
+  }
+
+  lang(lang: string): string | null | undefined {
+    return this.langJsonItemRef?.lang(lang);
   }
 }
 

@@ -1,0 +1,6 @@
+.github-markdown-body code, .github-markdown-body tt {
+    background-color: transparent !important;
+}
+.github-markdown-body table tr td:first-child{
+    color:#008800 !important;
+}

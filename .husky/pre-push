@@ -1,7 +1,21 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-vsix=bizzi-i18n-vscode-extension.vsix
-vsce package --out $vsix
-git add $vsix
-git commit -m "bundled"
+last_commit_msg=$(git show -s --format=%s)
+
+file_diff="$(git diff @~ @ --numstat | grep -Ev "husky|idea" | wc -l)"
+
+if [ $file_diff -gt 0 ]
+then
+    vsix=bizzi-i18n-vscode-extension.vsix
+    vsce package --out $vsix
+    git add $vsix
+    git commit -m "bundled: $last_commit_msg"
+fi
+
+last_bundled_id_from_head=$(git rev-list --branches --not --remotes=origin --count)
+if [ $last_bundled_id_from_head -gt 0 ]
+then
+    git reset --soft HEAD~${last_bundled_id_from_head}
+    git commit -m "bundled: $last_commit_msg"
+fi
