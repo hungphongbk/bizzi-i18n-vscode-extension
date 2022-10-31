@@ -8,3 +8,8 @@ export enum ExtensionRequestType {
 export type GetJsonRequestPayload = {
   ns: string;
 };
+
+export const predefinedLanguages = {
+  vi: { label: "Vietnam" },
+  en: { label: "English" },
+} as Record<string, { label: string }>;

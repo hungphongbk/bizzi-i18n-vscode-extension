@@ -1,10 +1,12 @@
 import { Config } from "core/config";
+import { access } from "fs";
 import throttle from "lodash/throttle";
 import { ExtensionModule, THROTTLE_DELAY } from "utils";
 import {
   DecorationOptions,
   Disposable,
   languages,
+  MarkdownString,
   Range,
   TextDocument,
   TextEditor,
@@ -30,10 +32,17 @@ const annotation: ExtensionModule = (ctx, client) => {
     annotations: DecorationOptions[],
     editor: TextEditor
   ) => {
-    editor.setDecorations(annotationTypes.none, annotations);
     editor.setDecorations(
       annotationTypes.disappear,
-      annotations.map(({ range }) => ({ range }))
+      annotations.map(({ range }) => ({
+        range,
+      }))
+    );
+    editor.setDecorations(
+      annotationTypes.none,
+      annotations.map((ann) => ({
+        ...ann,
+      }))
     );
   };
 

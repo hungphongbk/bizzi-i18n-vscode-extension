@@ -7,17 +7,26 @@ import {
   TextDocumentSyncKind,
   WorkspaceFolder,
   TextDocumentChangeEvent,
+  Hover,
 } from "vscode-languageserver/node";
 
 import Cache, { CacheValue } from "./cache";
 import { i18nJavascriptTraverse } from "./i18n-parser";
 import { UseTFuncReference, UseTranslationReference } from "./types";
 import { connection, document } from "./connection";
-import { delay, ExtensionRequestType, isTypescript, retry } from "@shared";
+import {
+  delay,
+  ExtensionRequestType,
+  isTypescript,
+  predefinedLanguages,
+  retry,
+} from "@shared";
 import { checkPositionInsideLoc } from "utils";
 import { extractI18nFromSelected } from "handlers";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import flatten from "lodash/flatten";
+import { renderMarkdown } from "../../shared/hover";
+import { mapValues } from "lodash";
 
 let workspaceFolders: WorkspaceFolder[] | null | undefined;
 
@@ -101,6 +110,16 @@ connection.onRequest(
         (cached.ref as UseTranslationReference[]).map((useTransRef) =>
           useTransRef.tFuncReferences.map((tFunRef) => ({
             range: Range.fromSourceLoc(tFunRef.fnLoc),
+            hoverMessage: {
+              value: renderMarkdown(
+                Object.keys(predefinedLanguages).reduce((acc, key) => {
+                  if (key === lang) {
+                    return acc;
+                  }
+                  return { ...acc, [key]: tFunRef.lang(lang) };
+                }, {})
+              ),
+            },
             renderOptions: {
               after: {
                 color: "#aaa",
@@ -112,7 +131,7 @@ connection.onRequest(
           }))
         )
       );
-      console.log(JSON.stringify(rs, null, 2));
+      // console.log(JSON.stringify(rs, null, 2));
       return rs;
     }
 
@@ -160,7 +179,6 @@ connection.onDefinition(async ({ textDocument, position }) => {
 
 connection.onHover(async ({ textDocument, position }) => {
   if (!/\.lang\.json$/.test(textDocument.uri)) {
-    console.time("def");
     const cached = Cache.instance.get(textDocument.uri)!,
       locBasedNode = cached?.locList.find((l) =>
         checkPositionInsideLoc(position, l.loc)
@@ -168,19 +186,21 @@ connection.onHover(async ({ textDocument, position }) => {
 
     if (locBasedNode instanceof UseTFuncReference) {
       const node = locBasedNode as UseTFuncReference;
-      return {
+      const payload: Hover = {
         contents: {
           kind: "markdown",
-          value: [
-            `- **Vietnam**: ${
-              node.langJsonItemRef?.lang("vi") ?? "_undefined_"
-            }`,
-            `- **English**: ${
-              node.langJsonItemRef?.lang("en") ?? "_undefined_"
-            }`,
-          ].join("\n"),
+          value: renderMarkdown(
+            Object.keys(predefinedLanguages).reduce((acc, key) => {
+              return {
+                ...acc,
+                [key]: node.langJsonItemRef?.lang(key),
+              };
+            }, {})
+          ),
         },
       };
+      // console.log(payload);
+      return payload;
     }
   }
   return null;
