@@ -49,10 +49,23 @@
         "command": "bizzi-i18n-vscode-extension.extractI18NFromSelected",
         "title": "Bizzi I18n: Extract from selected"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Bizzi I18n",
+      "properties": {
+        "bizzi-i18n.displayLanguage": {
+          "type": "string",
+          "description": "Display Language"
+        }
+      }
+    }
   },
-  "capabilities": {
-    "definitionProvider": true
+  "dependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/traverse": "^7.19.3",
+    "@babel/types": "^7.19.3",
+    "vscode-uri": "^3.0.6"
   },
   "repository": {
     "type": "git",

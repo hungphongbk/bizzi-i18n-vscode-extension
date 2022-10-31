@@ -5,12 +5,14 @@ import * as vscode from "vscode";
 // import I18nDefinitionProvider from "./engine/I18nDefinitionProvider";
 // import I18nExtensionVisitor from "./visitor/I18nExtensionVisitor";
 
-import { LanguageClient } from "vscode-languageclient/node";
 import { ExtensionRequestType } from "@shared";
 import { getWorkspaceFolder } from "utils";
 import I18nLanguageClient from "i18n-client";
+import commandModule from "commands";
+import coreModule from "core";
+import uiModule from "ui";
 
-let client: LanguageClient;
+let client: I18nLanguageClient;
 
 async function getJsonResourceFile(ns: string): Promise<string> {
   let uri: vscode.Uri | undefined = undefined;
@@ -40,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand(
-    "bizzi-i18n-vscode-extension.extractI18NFromSelected",
+    "bizzi-i18n.extractI18NFromSelected",
     async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor?.selection) {
@@ -56,7 +58,30 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(disposable);
+  // context.subscriptions.push(disposable);
+
+  // const definitionProvider = new I18nDefinitionProvider(false),
+  //   tsDefinitionProvider = new I18nDefinitionProvider(true);
+  // context.subscriptions.push(
+  //   vscode.languages.registerDefinitionProvider(
+  //     { scheme: "file", language: "javascript" },
+  //     definitionProvider
+  //   )
+  // );
+  // context.subscriptions.push(
+  //   vscode.languages.registerDefinitionProvider(
+  //     { scheme: "file", language: "typescript" },
+  //     tsDefinitionProvider
+  //   )
+  // );
+  // context.subscriptions.push(
+  //   vscode.languages.registerDefinitionProvider(
+  //     { scheme: "file", language: "typescriptreact" },
+  //     tsDefinitionProvider
+  //   )
+  // );
+
+  // I18nExtensionVisitor.init(context);
 
   // const definitionProvider = new I18nDefinitionProvider(false),
   //   tsDefinitionProvider = new I18nDefinitionProvider(true);
@@ -82,16 +107,13 @@ export function activate(context: vscode.ExtensionContext) {
   // I18nExtensionVisitor.init(context);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "bizzi-i18n-vscode-extension.restart",
-      () => {
-        client
-          .restart()
-          .catch((error) =>
-            client.error(`Restarting client failed`, error, "force")
-          );
-      }
-    )
+    vscode.commands.registerCommand("bizzi-i18n.restart", () => {
+      client
+        .restart()
+        .catch((error) =>
+          client.error(`Restarting client failed`, error, "force")
+        );
+    })
   );
 
   // Start the client. This will also launch the server
@@ -101,8 +123,12 @@ export function activate(context: vscode.ExtensionContext) {
       // Use the console to output diagnostic information (console.log) and errors (console.error)
       // This line of code will only be executed once when your extension is activated
       console.log(
-        'Congratulations, your extension "bizzi-i18n-vscode-extension" is now active!'
+        'Congratulations, your extension "bizzi-i18n" is now active!'
       );
+
+      context.subscriptions.push(...coreModule(context, client));
+      context.subscriptions.push(...uiModule(context, client));
+      context.subscriptions.push(...commandModule(context, client));
     })
     .catch((error) =>
       client.error(`Starting the server failed.`, error, "force")

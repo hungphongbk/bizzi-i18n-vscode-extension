@@ -53,6 +53,14 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
             encoding: "base64",
           },
         },
+        {
+          test: /\.svg$/,
+          loader: "svg-url-loader",
+          options: {
+            // make loader to behave like url-loader, for all svg files
+            encoding: "base64",
+          },
+        },
       ],
     },
     externals: {
@@ -62,6 +70,7 @@ module.exports = function withDefaults(/**@type WebpackConfig*/ extConfig) {
       // all output goes into `dist`.
       // packaging depends on that and this must always be like it
       filename: "[name].js",
+      // @ts-ignore
       path: path.join(extConfig.context, "out"),
       libraryTarget: "commonjs",
     },
