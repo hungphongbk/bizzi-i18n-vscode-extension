@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -10,6 +11,10 @@
 const withDefaults = require("../shared.webpack.config");
 const path = require("path");
 const { TsconfigPathsPlugin } = require("tsconfig-paths-webpack-plugin");
+const WebpackBuildNotifierPlugin = require("webpack-build-notifier");
+
+const isProduction =
+  process.argv[process.argv.indexOf("--mode") + 1] === "production";
 
 module.exports = withDefaults({
   context: path.join(__dirname),
@@ -28,4 +33,12 @@ module.exports = withDefaults({
     filename: "server.js",
     path: path.join(__dirname, "out"),
   },
+  plugins: [
+    !isProduction &&
+      // @ts-ignore
+      new WebpackBuildNotifierPlugin({
+        title: "Bizzi I18n Server",
+        suppressSuccess: true,
+      }),
+  ].filter(Boolean),
 });

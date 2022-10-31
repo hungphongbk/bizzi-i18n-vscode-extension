@@ -50,6 +50,10 @@ export default class I18nLanguageClient extends LanguageClient {
         ].map((language) => ({ scheme: "file", language })),
         { scheme: "file", language: "json", pattern: "**/*.lang.json" },
       ],
+      markdown: {
+        isTrusted: true,
+        supportHtml: true,
+      },
     };
     super(
       "bizzi-i18n-server",

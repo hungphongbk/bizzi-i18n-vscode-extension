@@ -40,6 +40,9 @@
   ],
   "main": "./client/out/extension",
   "contributes": {
+    "markdown.previewStyles": [
+      "./resources/styles.css"
+    ],
     "commands": [
       {
         "command": "bizzi-i18n.restart",
